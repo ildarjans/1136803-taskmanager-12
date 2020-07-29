@@ -1,21 +1,18 @@
 'use strict';
 const CARDS_TO_DISPLAY = 3;
-const main = document.querySelector('.main');
+const main = document.querySelector(`.main`);
 
-import {createNavTemplate} from './nav.js';
+const createNavTemplate = window.nav.createNavTemplate;
+const createBoardTemplate = window.board.createBoardTemplate;
+const {createTaskCard, createTaskEditCard} = window.tasks;
 
-import {createBoardTemplate} from './board.js';
+main.insertAdjacentHTML(`beforeend`, createNavTemplate());
+main.insertAdjacentHTML(`beforeend`, createBoardTemplate());
 
-import {createTaskCard, createTaskEditCard} from './tasks.js';
+const taskContainer = main.querySelector(`.board__tasks`);
 
-main.insertAdjacentHTML('beforeend', createNavTemplate());
-main.insertAdjacentHTML('beforeend', createBoardTemplate());
-
-const taskContainer = main.querySelector('.board__tasks');
-
-taskContainer.insertAdjacentHTML('beforeend', createTaskEditCard());
+taskContainer.insertAdjacentHTML(`beforeend`, createTaskEditCard());
 
 for (let i = 0; i < CARDS_TO_DISPLAY; i++) {
-  taskContainer.insertAdjacentHTML('beforeend', createTaskCard());
+  taskContainer.insertAdjacentHTML(`beforeend`, createTaskCard());
 }
-

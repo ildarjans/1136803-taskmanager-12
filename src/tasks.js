@@ -253,8 +253,8 @@
   }
 
   window.tasks = {
-    createTaskCard,
-    createTaskEditCard
+    createCardTemplate: createTaskCard,
+    createEditCardTemplate: createTaskEditCard
   };
 
 })();

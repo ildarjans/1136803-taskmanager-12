@@ -28,11 +28,10 @@ function createTaskContainer() {
 function createLoadMoreButton() {
   return (
     `<button
-      class="load-more"
-      type="button"
+        class="load-more"
+        type="button"
       >
       load more
-      </button>
-    `
+    </button>`
   );
 }

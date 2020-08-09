@@ -1,4 +1,3 @@
-'use strict';
 const path = require('path');
 
 module.exports = {
@@ -10,9 +9,9 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'public'),
+    contentBase: path.join(__dirname, 'public/js'),
     watchContentBase: true,
-    compress: true,
+    compress: false,
     port: 8000
   }
 };

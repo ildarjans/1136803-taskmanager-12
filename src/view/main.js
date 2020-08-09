@@ -1,21 +1,51 @@
-const CARDS_TO_DISPLAY = 3;
-const main = document.querySelector(`.main`);
-const controlContainer = document.querySelector(`.main__control`);
-
+import {
+  CARDS_TO_DISPLAY,
+  TASKS_LENGTH,
+  SINGLE_CARD_TO_DISPLAY,
+} from './constants.js';
+import {getRandomTask} from './task-mock.js';
+import {getTasksFilterArray} from './filter-mock.js';
+import {renderCardTemplates, render} from './render.js';
 import {createControlTemplate} from './control.js';
 import {createFiltersTemplate} from './filter.js';
 import {createBoardTemplate} from './board.js';
-import {createCardTemplate, createEditCardTemplate} from './tasks.js';
+import {createCardTemplate} from './task.js';
+import {createEditCardTemplate} from './task-edit.js';
 
-controlContainer.insertAdjacentHTML(`beforeend`, createControlTemplate());
-main.insertAdjacentHTML(`beforeend`, createFiltersTemplate());
-main.insertAdjacentHTML(`beforeend`, createBoardTemplate());
+const main = document.querySelector(`.main`);
+const controlContainer = document.querySelector(`.main__control`);
+const tasks = Array(TASKS_LENGTH).fill().map(getRandomTask);
+const filterTitlesArray = getTasksFilterArray(tasks);
+const isBoardOverflow = tasks.length > CARDS_TO_DISPLAY;
+let loadMoreBtn;
+
+render(controlContainer, createControlTemplate());
+render(main, createFiltersTemplate(filterTitlesArray));
+render(main, createBoardTemplate(isBoardOverflow));
 
 const taskContainer = main.querySelector(`.board__tasks`);
+const renderTaskCardTemplates = renderCardTemplates(
+    taskContainer,
+    tasks.slice(),
+    createCardTemplate,
+    CARDS_TO_DISPLAY,
+    removeLoadMoreButton
+);
 
-taskContainer.insertAdjacentHTML(`beforeend`, createEditCardTemplate());
-
-
-for (let i = 0; i < CARDS_TO_DISPLAY; i++) {
-  taskContainer.insertAdjacentHTML(`beforeend`, createCardTemplate());
+if (isBoardOverflow) {
+  loadMoreBtn = document.querySelector(`button.load-more`);
+  loadMoreBtn.addEventListener(`click`, moreButtonClickHandler);
 }
+
+function moreButtonClickHandler() {
+  renderTaskCardTemplates();
+}
+
+function removeLoadMoreButton() {
+  loadMoreBtn.removeEventListener(`click`, moreButtonClickHandler);
+  loadMoreBtn.remove();
+}
+
+renderTaskCardTemplates(SINGLE_CARD_TO_DISPLAY, createEditCardTemplate);
+renderTaskCardTemplates(CARDS_TO_DISPLAY - SINGLE_CARD_TO_DISPLAY);
+

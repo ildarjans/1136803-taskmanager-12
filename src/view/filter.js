@@ -1,4 +1,8 @@
-export function createFiltersTemplate() {
+export function createFiltersTemplate(filterTitlesArray) {
+  const filterData = {};
+  filterTitlesArray.forEach((filter) => {
+    filterData[filter.title] = filter.count;
+  });
   return (
     `<section class="main__filter filter container">
     <input
@@ -9,7 +13,10 @@ export function createFiltersTemplate() {
       checked
     />
     <label for="filter__all" class="filter__label">
-      All <span class="filter__all-count">1</span></label
+      All
+      <span class="filter__all-count">
+        ${filterData[`all`]}
+      </span></label
     >
     <input
       type="radio"
@@ -19,7 +26,11 @@ export function createFiltersTemplate() {
       disabled
     />
     <label for="filter__overdue" class="filter__label"
-      >Overdue <span class="filter__overdue-count">0</span></label
+      >Overdue
+      <span class="filter__overdue-count">
+        ${filterData[`overdue`]}
+      </span>
+    </label
     >
     <input
       type="radio"
@@ -29,7 +40,11 @@ export function createFiltersTemplate() {
       disabled
     />
     <label for="filter__today" class="filter__label"
-      >Today <span class="filter__today-count">0</span></label
+      >Today
+      <span class="filter__today-count">
+        ${filterData[`today`]}
+      </span>
+    </label
     >
     <input
       type="radio"
@@ -39,7 +54,11 @@ export function createFiltersTemplate() {
       disabled
     />
     <label for="filter__favorites" class="filter__label"
-      >Favorites <span class="filter__favorites-count">0</span></label
+      >Favorites
+      <span class="filter__favorites-count">
+        ${filterData[`favorite`]}
+      </span>
+      </label
     >
     <input
       type="radio"
@@ -49,7 +68,11 @@ export function createFiltersTemplate() {
       disabled
     />
     <label for="filter__repeating" class="filter__label"
-      >Repeating <span class="filter__repeating-count">0</span></label
+      >Repeating
+      <span class="filter__repeating-count">
+        ${filterData[`repeating`]}
+      </span>
+    </label
     >
     <input
       type="radio"
@@ -58,7 +81,11 @@ export function createFiltersTemplate() {
       name="filter"
     />
     <label for="filter__archive" class="filter__label"
-      >Archive <span class="filter__archive-count">115</span></label
+      >Archive
+      <span class="filter__archive-count">
+        ${filterData[`archive`]}
+      </span>
+    </label
     >
   </section>`
   );

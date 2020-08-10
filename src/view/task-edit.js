@@ -1,6 +1,6 @@
-import {getDeadlineDateString} from './utilities.js';
+import {getDeadlineDateString} from '../utilities.js';
 
-import {extendedDateFormatOptions, COLORS} from './constants.js';
+import {extendedDateFormatOptions, COLORS} from '../consts.js';
 
 export function createEditCardTemplate(task) {
   const {

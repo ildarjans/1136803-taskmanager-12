@@ -1,7 +1,7 @@
-import {getDeadlineDateString} from './utilities.js';
-import {getDeadlineTimeString} from './utilities.js';
+import {getDeadlineDateString} from '../utilities.js';
+import {getDeadlineTimeString} from '../utilities.js';
 
-import {dateFormatOptions, timeFormatOptions} from './constants.js';
+import {dateFormatOptions, timeFormatOptions} from '../consts.js';
 
 export function createCardTemplate(task) {
   const {

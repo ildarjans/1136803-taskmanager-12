@@ -7,11 +7,7 @@ export function getRandomArrayElement(arr) {
 }
 
 export function getDeadlineDateString(date, options, locals = `en-Us`) {
-  return `${
-    date.getDate()
-  } ${
-    date.toLocaleDateString(locals, options)
-  }`;
+  return `${date.getDate()} ${date.toLocaleDateString(locals, options)}`;
 }
 
 export function getDeadlineTimeString(date, options, locals = `en-Us`) {

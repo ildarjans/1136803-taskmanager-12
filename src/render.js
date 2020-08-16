@@ -1,12 +1,19 @@
-export function render(container, content, place = `beforeend`) {
+import {
+  CARDS_TO_DISPLAY
+} from './consts.js';
+
+export function renderContent(
+    container,
+    content,
+    place = `beforeend`
+) {
   container.insertAdjacentHTML(place, content);
 }
 
-export function renderCardTemplates(container,
+export function renderCardTemplates(
+    container,
     tasks,
     template,
-    step,
-    exitFn,
     place = `beforeend`
 ) {
   let lastIndex = 0;
@@ -14,18 +21,15 @@ export function renderCardTemplates(container,
 
     if (lastIndex < tasks.length) {
 
-      const sliceStep = manualStep || step;
-      const tasksSlice = tasks.slice(lastIndex, lastIndex + sliceStep);
+      const sliceStep = manualStep || CARDS_TO_DISPLAY;
 
-      for (let i = 0; i < tasksSlice.length; i++) {
-        render(container, manualTemplate(tasksSlice[i]), place);
-      }
+      tasks
+      .slice(lastIndex, lastIndex + sliceStep)
+      .forEach((task) => {
+        renderContent(container, manualTemplate(task, place));
+      });
 
       lastIndex = lastIndex + sliceStep;
-
-      if (lastIndex > tasks.length) {
-        exitFn();
-      }
     }
   };
 }

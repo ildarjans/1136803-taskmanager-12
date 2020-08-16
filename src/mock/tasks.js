@@ -3,6 +3,9 @@ import {COLORS} from '../consts.js';
 
 // use here coz it's only for this mock module
 const MAX_DAY_DEVIATION = 7;
+const LOWER_HOUR = 7;
+const HIGHER_HOUR = 23;
+const MINS_IN_HOUR = 59;
 
 const descriptions = [
   `Изучить теорию`,
@@ -10,11 +13,11 @@ const descriptions = [
   `Пройти интенсив на соточку`
 ];
 
-function setDeadlineDate() {
+function getDeadlineDate() {
   let newDate = new Date();
   const day = newDate.getUTCDate() + getRandomInteger(-MAX_DAY_DEVIATION, MAX_DAY_DEVIATION);
-  const hour = getRandomInteger(23, 7);
-  const minutes = getRandomInteger(59);
+  const hour = getRandomInteger(HIGHER_HOUR, LOWER_HOUR);
+  const minutes = getRandomInteger(MINS_IN_HOUR);
 
   newDate.setUTCDate(day);
   newDate.setUTCHours(hour, minutes);
@@ -43,7 +46,7 @@ export function getRandomTask() {
 
   const dueDate = isTaskRepeating(repeatingDays) ?
     null :
-    setDeadlineDate();
+    getDeadlineDate();
 
   return {
     description,

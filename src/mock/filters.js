@@ -34,7 +34,7 @@ function countTasksFilterProperties(tasks) {
   return counter;
 }
 
-export function getTasksFilterArray(tasks) {
+export function getFilterTitlesArray(tasks) {
   let tasksFilter = [];
   const titlesCounter = countTasksFilterProperties(tasks);
   filterTitles.forEach((title) => {

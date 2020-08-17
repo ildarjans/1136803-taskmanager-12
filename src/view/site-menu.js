@@ -1,4 +1,6 @@
-export function createControlTemplate() {
+import {createDOMElement} from '../render.js';
+
+function createControlTemplate() {
   return (
     `<section class="control__btn-wrap">
     <input
@@ -31,3 +33,23 @@ export function createControlTemplate() {
   );
 }
 
+export default class SiteMenu {
+  constructor() {
+    this._element = null;
+  }
+
+  _getTemplate() {
+    return createControlTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createDOMElement(this._getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

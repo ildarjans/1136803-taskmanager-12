@@ -1,9 +1,10 @@
-export function createBoardTemplate() {
+import {createLoadMoreButton} from './load-more-button.js';
+export function createBoardTemplate(isOverflow) {
   return (
     `<section class="board container">
       ${createBoardSortTemplate()}
       ${createTaskContainer()}
-      ${createLoadMoreButton()}
+      ${isOverflow ? createLoadMoreButton() : ``}
     </section>`
   );
 }
@@ -22,17 +23,5 @@ function createTaskContainer() {
   return (
     `<div class="board__tasks">
     </div>`
-  );
-}
-
-function createLoadMoreButton() {
-  return (
-    `<button
-      class="load-more"
-      type="button"
-      >
-      load more
-      </button>
-    `
   );
 }

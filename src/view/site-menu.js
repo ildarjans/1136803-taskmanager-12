@@ -49,7 +49,7 @@ export default class SiteMenu {
     return this._element;
   }
 
-  removeElement() {
+  resetElement() {
     this._element = null;
   }
 }

@@ -1,7 +1,6 @@
 import {
   CARDS_TO_DISPLAY,
   TASKS_LENGTH,
-  SINGLE_CARD_TO_DISPLAY,
 } from './consts.js';
 
 import SiteMenu from './view/site-menu.js';
@@ -9,20 +8,17 @@ import MainBoard from './view/main-board.js';
 import SortList from './view/sort-list.js';
 import TasksBoard from './view/tasks-board.js';
 import LoadMoreButton from './view/load-more-button.js';
-import Filters from './view/filter.js';
+import Task from './view/task-card.js';
+import TaskEdit from './view/task-edit-card.js';
+import Filters from './view/tasks-filter.js';
 import {getRandomTask} from './mock/tasks.js';
 import {getFilterTitlesArray} from './mock/filters.js';
-import {renderCardTemplates, renderContent, renderElement} from './render.js';
-import {createCardTemplate} from './view/task-card.js';
-import {createEditCardTemplate} from './view/task-edit-card.js';
+import {renderElement} from './render.js';
 
 const main = document.querySelector(`.main`);
 const controlContainer = document.querySelector(`.main__control`);
 const tasks = Array(TASKS_LENGTH).fill().map(getRandomTask);
 const filterTitles = getFilterTitlesArray(tasks);
-// const isNeedLoadMoreBtn = tasks.length > CARDS_TO_DISPLAY;
-let loadMoreBtn;
-let loadMoreBtnClickCounter = 0; // count CARD_TO_DISPLAY pool of cards
 
 renderElement(controlContainer, new SiteMenu().getElement());
 renderElement(main, new Filters(filterTitles).getElement());
@@ -31,41 +27,63 @@ renderElement(main, new MainBoard().getElement());
 const mainBoardContainer = main.querySelector(`.board.container`);
 renderElement(mainBoardContainer, new SortList().getElement());
 renderElement(mainBoardContainer, new TasksBoard().getElement());
-renderElement(mainBoardContainer, new LoadMoreButton().getElement());
 const tasksBoardContainer = main.querySelector(`.board__tasks`);
 
-const renderTaskCardTemplates = renderCardTemplates(
-    tasksBoardContainer,
-    tasks.slice(),
-    createCardTemplate // as default fn
-);
 
-// if (isNeedLoadMoreBtn) {
-//   loadMoreBtn = document.querySelector(`button.load-more`);
-//   loadMoreBtn.addEventListener(`click`, moreButtonClickHandler);
-// }
+// render first pool of cards
+let lastRenderedTaskIndex = 0;
+tasks
+  .slice(0, CARDS_TO_DISPLAY)
+  .forEach((task) => {
+    renderTask(tasksBoardContainer, task);
+    lastRenderedTaskIndex++;
+  });
 
-// ------------------------------------
-// render 1st pool of cards
-// args: 1) card quantity (single) 2) pass ManualTemplate Fn, for renderContent EditCard Template
-renderTaskCardTemplates(SINGLE_CARD_TO_DISPLAY, createEditCardTemplate);
+// if necessary add loadMoreButton
+if (tasks.length > CARDS_TO_DISPLAY) {
+  const loadMoreBtn = new LoadMoreButton();
+  renderElement(mainBoardContainer, loadMoreBtn.getElement());
+  loadMoreBtn.getElement().addEventListener(`click`, () => {
+    tasks
+    .slice(lastRenderedTaskIndex, lastRenderedTaskIndex + CARDS_TO_DISPLAY)
+    .forEach((task) => {
+      renderTask(tasksBoardContainer, task);
+      lastRenderedTaskIndex++;
+    });
 
-// args: 1) card quantity (8 - rendered before as 1 = 7)
-renderTaskCardTemplates(CARDS_TO_DISPLAY - SINGLE_CARD_TO_DISPLAY);
-
-loadMoreBtnClickCounter++;
-
-// ------------------------------------
-
-function moreButtonClickHandler() {
-  renderTaskCardTemplates();
-  loadMoreBtnClickCounter++;
-  if (CARDS_TO_DISPLAY * loadMoreBtnClickCounter >= tasks.length) {
-    removeLoadMoreButton();
-  }
+    if (lastRenderedTaskIndex === tasks.length) {
+      loadMoreBtn.getElement().remove();
+      loadMoreBtn.resetElement();
+    }
+  });
 }
 
-function removeLoadMoreButton() {
-  loadMoreBtn.removeEventListener(`click`, moreButtonClickHandler);
-  loadMoreBtn.remove();
+function renderTask(container, task) {
+  const taskCard = new Task(task);
+  const taskEditCard = new TaskEdit(task);
+  renderElement(container, taskCard.getElement());
+
+  function switchToEditForm() {
+    container.replaceChild(taskEditCard.getElement(), taskCard.getElement());
+  }
+  function switchToCard() {
+    container.replaceChild(taskCard.getElement(), taskEditCard.getElement());
+  }
+
+  taskCard
+    .getElement()
+    .querySelector(`.card__btn--edit`)
+    .addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      switchToEditForm();
+    });
+
+  taskEditCard
+    .getElement()
+    .querySelector(`form`)
+    .addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+      switchToCard();
+    });
+
 }

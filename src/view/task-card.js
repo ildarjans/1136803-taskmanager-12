@@ -1,9 +1,8 @@
-import {getDeadlineDateString} from '../utilities.js';
-import {getDeadlineTimeString} from '../utilities.js';
-
+import {getDeadlineDateString, getDeadlineTimeString} from '../utilities.js';
 import {dateFormatOptions, timeFormatOptions} from '../consts.js';
+import {createDOMElement} from '../render.js';
 
-export function createCardTemplate(task) {
+function createCardTemplate(task) {
   const {
     description,
     color,
@@ -72,3 +71,28 @@ export function createCardTemplate(task) {
   </article>`
   );
 }
+
+export default class Task {
+  constructor(task) {
+    this._element = null;
+    this._task = task;
+  }
+
+  _getTemplate() {
+    return createCardTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createDOMElement(this._getTemplate());
+    }
+
+    return this._element;
+  }
+
+  resetElement() {
+    this._element = null;
+  }
+}
+
+

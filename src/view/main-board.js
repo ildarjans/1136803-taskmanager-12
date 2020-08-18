@@ -23,7 +23,7 @@ export default class MainBoard {
     return this._element;
   }
 
-  removeElement() {
+  resetElement() {
     this._element = null;
   }
 }

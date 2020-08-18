@@ -1,4 +1,3 @@
-const SINGLE_CARD_TO_DISPLAY = 1;
 const CARDS_TO_DISPLAY = 8;
 const TASKS_LENGTH = 30;
 const COLORS = [
@@ -26,7 +25,6 @@ export {
   extendedDateFormatOptions,
   CARDS_TO_DISPLAY,
   TASKS_LENGTH,
-  SINGLE_CARD_TO_DISPLAY,
   COLORS
 };
 

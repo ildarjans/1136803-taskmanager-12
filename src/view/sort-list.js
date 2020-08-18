@@ -26,7 +26,7 @@ export default class SortList {
     return this._element;
   }
 
-  removeElement() {
+  resetElement() {
     this._element = null;
   }
 }

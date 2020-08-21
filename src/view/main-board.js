@@ -1,19 +1,15 @@
 import {createDOMElement} from '../render.js';
 
-function createBoardTemplate() {
-  return (
-    `<section class="board container">
-    </section>`
-  );
-}
-
-export default class MainBoard {
+export default class MainBoardView {
   constructor() {
     this._element = null;
   }
 
   _getTemplate() {
-    return createBoardTemplate();
+    return (
+      `<section class="board container">
+      </section>`
+    );
   }
 
   getElement() {

@@ -1,22 +1,19 @@
 import {createDOMElement} from '../render.js';
-function createLoadMoreButton() {
-  return (
-    `<button
-        class="load-more"
-        type="button"
-      >
-      load more
-    </button>`
-  );
-}
 
-export default class LoadMoreButton {
+export default class LoadMoreButtonView {
   constructor() {
     this._element = null;
   }
 
   _getTemplate() {
-    return createLoadMoreButton();
+    return (
+      `<button
+        class="load-more"
+        type="button"
+      >
+        load more
+      </button>`
+    );
   }
 
   getElement() {

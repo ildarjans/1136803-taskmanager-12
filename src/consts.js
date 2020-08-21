@@ -1,5 +1,6 @@
 const CARDS_TO_DISPLAY = 8;
-const TASKS_LENGTH = 30;
+const TASKS_LENGTH = 24;
+const EMPTY_MESSAGE = `Click «ADD NEW TASK» in menu to create your first task`;
 const COLORS = [
   `black`,
   `yellow`,
@@ -25,6 +26,7 @@ export {
   extendedDateFormatOptions,
   CARDS_TO_DISPLAY,
   TASKS_LENGTH,
-  COLORS
+  COLORS,
+  EMPTY_MESSAGE
 };
 

@@ -7,13 +7,13 @@ export function renderContent(
 }
 
 export function renderElement(container, element, place = `beforeend`) {
-  if (place === `beforeend`) {
-    container.append(element);
-    return;
-  }
-  if (place === `afterbegin`) {
-    container.prepend(element);
-    return;
+  switch (place) {
+    case (`beforeend`):
+      container.append(element);
+      break;
+    case (`afterbegin`):
+      container.prepend(element);
+      break;
   }
 }
 

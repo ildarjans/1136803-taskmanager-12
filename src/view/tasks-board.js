@@ -1,19 +1,15 @@
 import {createDOMElement} from '../render.js';
 
-function createTaskContainer() {
-  return (
-    `<div class="board__tasks">
-    </div>`
-  );
-}
-
-export default class TasksBoard {
+export default class TasksBoardView {
   constructor() {
     this._element = null;
   }
 
   _getTemplate() {
-    return createTaskContainer();
+    return (
+      `<div class="board__tasks">
+      </div>`
+    );
   }
 
   getElement() {

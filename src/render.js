@@ -1,20 +1,17 @@
-export function renderContent(
-    container,
-    content,
-    place = `beforeend`
-) {
-  container.insertAdjacentHTML(place, content);
+import AbstractView from "./view/Abstract";
+
+export function renderLastPlaceElement(container, element) {
+  container = getAbstractClassDOMElement(container);
+  element = getAbstractClassDOMElement(element);
+  container.append(element);
 }
 
-export function renderElement(container, element, place = `beforeend`) {
-  switch (place) {
-    case (`beforeend`):
-      container.append(element);
-      break;
-    case (`afterbegin`):
-      container.prepend(element);
-      break;
-  }
+export function renderFirstPlaceElement(container, element) {
+  container = getAbstractClassDOMElement(container);
+  element = getAbstractClassDOMElement(element);
+  container.append(element);
+
+  container.prepend(element);
 }
 
 export function createDOMElement(content) {
@@ -22,4 +19,10 @@ export function createDOMElement(content) {
   wrapper.innerHTML = content;
 
   return wrapper.firstChild;
+}
+
+export function getAbstractClassDOMElement(element) {
+  return element instanceof AbstractView ?
+    element.getElement() :
+    element;
 }

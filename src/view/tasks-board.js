@@ -1,25 +1,10 @@
-import {createDOMElement} from '../render.js';
+import AbstractView from './Abstract.js';
 
-export default class TasksBoardView {
-  constructor() {
-    this._element = null;
-  }
-
+export default class TasksBoardView extends AbstractView {
   _getTemplate() {
     return (
       `<div class="board__tasks">
       </div>`
     );
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createDOMElement(this._getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

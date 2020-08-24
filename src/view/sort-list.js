@@ -1,10 +1,6 @@
-import {createDOMElement} from '../render.js';
+import AbstractView from './Abstract.js';
 
-export default class SortListView {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SortListView extends AbstractView {
   _getTemplate() {
     return (
       `<div class="board__filter-list">
@@ -13,16 +9,5 @@ export default class SortListView {
         <a href="#" class="board__filter" data-sort-type="date-down">SORT BY DATE down</a>
       </div>`
     );
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createDOMElement(this._getTemplate());
-    }
-    return this._element;
-  }
-
-  resetElement() {
-    this._element = null;
   }
 }

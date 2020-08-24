@@ -1,62 +1,67 @@
 import {
   CARDS_TO_DISPLAY,
   TASKS_LENGTH,
-  SINGLE_CARD_TO_DISPLAY,
+  EMPTY_MESSAGE
 } from './consts.js';
+
+import SiteMenuView from './view/site-menu.js';
+import MainBoardView from './view/main-board.js';
+import SortListView from './view/sort-list.js';
+import TasksBoardView from './view/tasks-board.js';
+import LoadMoreButtonView from './view/load-more-button.js';
+import FiltersView from './view/tasks-filter.js';
+import EmptyBoardMessageView from './view/empty-board-message.js';
 import {getRandomTask} from './mock/tasks.js';
-import {getTasksFilterArray} from './mock/filters.js';
-import {renderCardTemplates, renderContent} from './render.js';
-import {createControlTemplate} from './view/control.js';
-import {createFiltersTemplate} from './view/filter.js';
-import {createBoardTemplate} from './view/board.js';
-import {createCardTemplate} from './view/task.js';
-import {createEditCardTemplate} from './view/task-edit.js';
+import {getFilterTitlesArray} from './mock/filters.js';
+import {renderElement} from './render.js';
+import {renderTaskComponent} from './view/render-task-component.js';
 
 const main = document.querySelector(`.main`);
 const controlContainer = document.querySelector(`.main__control`);
 const tasks = Array(TASKS_LENGTH).fill().map(getRandomTask);
-const filterTitlesArray = getTasksFilterArray(tasks);
-const isNeedLoadMoreBtn = tasks.length > CARDS_TO_DISPLAY;
-let loadMoreBtn;
-let loadMoreBtnClickCounter = 0; // count CARD_TO_DISPLAY pool of cards
+const filterTitles = getFilterTitlesArray(tasks);
 
-renderContent(controlContainer, createControlTemplate());
-renderContent(main, createFiltersTemplate(filterTitlesArray));
-renderContent(main, createBoardTemplate(isNeedLoadMoreBtn));
+renderElement(controlContainer, new SiteMenuView().getElement());
+renderElement(main, new FiltersView(filterTitles).getElement());
+renderElement(main, new MainBoardView().getElement());
 
-const taskContainer = main.querySelector(`.board__tasks`);
-const renderTaskCardTemplates = renderCardTemplates(
-    taskContainer,
-    tasks.slice(),
-    createCardTemplate // as default fn
-);
+const mainBoardContainer = main.querySelector(`.board.container`);
 
-if (isNeedLoadMoreBtn) {
-  loadMoreBtn = document.querySelector(`button.load-more`);
-  loadMoreBtn.addEventListener(`click`, moreButtonClickHandler);
+// if tasks empty render empty message
+if (tasks.length === 0) {
+  const emptyMessage = new EmptyBoardMessageView(EMPTY_MESSAGE);
+  renderElement(mainBoardContainer, emptyMessage.getElement());
+} else {
+  renderElement(mainBoardContainer, new SortListView().getElement());
+  renderElement(mainBoardContainer, new TasksBoardView().getElement());
 }
 
-// ------------------------------------
-// render 1st pool of cards
-// args: 1) card quantity (single) 2) pass ManualTemplate Fn, for renderContent EditCard Template
-renderTaskCardTemplates(SINGLE_CARD_TO_DISPLAY, createEditCardTemplate);
+const tasksBoardContainer = main.querySelector(`.board__tasks`);
+// render first pool of cards
+let lastRenderedTaskIndex = 0;
+tasks
+  .slice(0, CARDS_TO_DISPLAY)
+  .forEach((task) => {
+    renderTaskComponent(tasksBoardContainer, task);
+    lastRenderedTaskIndex++;
+  });
 
-// args: 1) card quantity (8 - rendered before as 1 = 7)
-renderTaskCardTemplates(CARDS_TO_DISPLAY - SINGLE_CARD_TO_DISPLAY);
+// if necessary add loadMoreButton
+if (tasks.length > CARDS_TO_DISPLAY) {
+  const loadMoreBtn = new LoadMoreButtonView();
+  renderElement(mainBoardContainer, loadMoreBtn.getElement());
+  loadMoreBtn.getElement().addEventListener(`click`, () => {
+    tasks
+    .slice(lastRenderedTaskIndex, lastRenderedTaskIndex + CARDS_TO_DISPLAY)
+    .forEach((task) => {
+      renderTaskComponent(tasksBoardContainer, task);
+      lastRenderedTaskIndex++;
+    });
 
-loadMoreBtnClickCounter++;
-
-// ------------------------------------
-
-function moreButtonClickHandler() {
-  renderTaskCardTemplates();
-  loadMoreBtnClickCounter++;
-  if (CARDS_TO_DISPLAY * loadMoreBtnClickCounter >= tasks.length) {
-    removeLoadMoreButton();
-  }
-}
-
-function removeLoadMoreButton() {
-  loadMoreBtn.removeEventListener(`click`, moreButtonClickHandler);
-  loadMoreBtn.remove();
+    // if all tasks displayed remove button
+    if (lastRenderedTaskIndex === tasks.length) {
+      loadMoreBtn.getElement().remove();
+      loadMoreBtn.resetElement();
+    }
+  });
 }

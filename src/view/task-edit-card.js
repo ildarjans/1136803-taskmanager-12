@@ -1,8 +1,8 @@
+import {createDOMElement} from '../render.js';
 import {getDeadlineDateString} from '../utilities.js';
-
 import {extendedDateFormatOptions, COLORS} from '../consts.js';
 
-export function createEditCardTemplate(task) {
+function createEditCardTemplate(task) {
   const {
     description,
     color,
@@ -124,4 +124,28 @@ function createTaskMarkupColorTemplate(selectedColor) {
     >${color}</label
   >`;
   }).join(``);
+}
+
+export default class TaskEditView {
+  constructor(task) {
+    this._element = null;
+    this._task = task;
+  }
+
+  _getTemplate() {
+    return createEditCardTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createDOMElement(this._getTemplate());
+    }
+
+    return this._element;
+  }
+
+  resetElement() {
+    this._element = null;
+  }
+
 }

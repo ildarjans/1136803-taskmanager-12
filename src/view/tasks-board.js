@@ -1,18 +1,14 @@
 import {createDOMElement} from '../render.js';
 
-export default class LoadMoreButtonView {
+export default class TasksBoardView {
   constructor() {
     this._element = null;
   }
 
   _getTemplate() {
     return (
-      `<button
-        class="load-more"
-        type="button"
-      >
-        load more
-      </button>`
+      `<div class="board__tasks">
+      </div>`
     );
   }
 
@@ -23,7 +19,7 @@ export default class LoadMoreButtonView {
     return this._element;
   }
 
-  resetElement() {
+  removeElement() {
     this._element = null;
   }
 }

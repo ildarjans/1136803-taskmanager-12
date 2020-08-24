@@ -1,7 +1,3 @@
-import {
-  CARDS_TO_DISPLAY
-} from './consts.js';
-
 export function renderContent(
     container,
     content,
@@ -10,26 +6,20 @@ export function renderContent(
   container.insertAdjacentHTML(place, content);
 }
 
-export function renderCardTemplates(
-    container,
-    tasks,
-    template,
-    place = `beforeend`
-) {
-  let lastIndex = 0;
-  return (manualStep = 0, manualTemplate = template) => {
+export function renderElement(container, element, place = `beforeend`) {
+  switch (place) {
+    case (`beforeend`):
+      container.append(element);
+      break;
+    case (`afterbegin`):
+      container.prepend(element);
+      break;
+  }
+}
 
-    if (lastIndex < tasks.length) {
+export function createDOMElement(content) {
+  const wrapper = document.createElement(`div`);
+  wrapper.innerHTML = content;
 
-      const sliceStep = manualStep || CARDS_TO_DISPLAY;
-
-      tasks
-      .slice(lastIndex, lastIndex + sliceStep)
-      .forEach((task) => {
-        renderContent(container, manualTemplate(task, place));
-      });
-
-      lastIndex = lastIndex + sliceStep;
-    }
-  };
+  return wrapper.firstChild;
 }

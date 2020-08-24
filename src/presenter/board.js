@@ -20,9 +20,9 @@ import {
   getAbstractClassDOMElement
 } from '../render.js';
 
-export default class TaskPresenter {
-  constructor(main, menuContainer) {
-    this._main = main;
+export default class BoardPresenter {
+  constructor(mainContainer, menuContainer) {
+    this._mainContainer = mainContainer;
     this._menuContainer = menuContainer;
     this._tasks = null;
     this._filters = null;
@@ -32,6 +32,7 @@ export default class TaskPresenter {
     this._taskBoard = new TasksBoardView();
     this._loadMoreBtn = null;
     this._emptyBoardNotification = new EmptyBoardNotificationView(EMPTY_MESSAGE);
+    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
     this._lastTaskIndex = 0;
   }
 
@@ -55,7 +56,7 @@ export default class TaskPresenter {
   }
 
   _renderMainBoard() {
-    renderLastPlaceElement(this._main, this._mainBoard);
+    renderLastPlaceElement(this._mainContainer, this._mainBoard);
   }
 
   _renderTaskBoard() {
@@ -69,7 +70,7 @@ export default class TaskPresenter {
   _renderFilters() {
     const filterTitles = getFilterTitlesArray(this._tasks);
     this._filters = new FiltersView(filterTitles);
-    renderLastPlaceElement(this._main, this._filters);
+    renderLastPlaceElement(this._mainContainer, this._filters);
   }
 
   _renderNotification() {
@@ -85,12 +86,22 @@ export default class TaskPresenter {
     renderLastPlaceElement(container, taskCard);
 
     function switchToEditForm() {
-      container.replaceChild(taskEditCard.getElement(), taskCard.getElement());
+      container
+        .getElement()
+        .replaceChild(
+            taskEditCard.getElement(),
+            taskCard.getElement()
+        );
       window.addEventListener(`keydown`, windowEscapeHandler);
     }
 
     function switchToCard() {
-      container.replaceChild(taskCard.getElement(), taskEditCard.getElement());
+      container
+        .getElement()
+        .replaceChild(
+            taskCard.getElement(),
+            taskEditCard.getElement()
+        );
       window.removeEventListener(`keydown`, windowEscapeHandler);
     }
 
@@ -107,7 +118,7 @@ export default class TaskPresenter {
 
   _renderLoadMoreButton() {
     this._loadMoreBtn = new LoadMoreButtonView();
-    this._loadMoreBtn.setClickHandler(this._renderTaskSlice.bind(this));
+    this._loadMoreBtn.setClickHandler(this._loadMoreBtnClickHandler);
     renderLastPlaceElement(this._mainBoard, this._loadMoreBtn);
   }
 
@@ -127,7 +138,7 @@ export default class TaskPresenter {
         this._renderTaskComponent(this._taskBoard, task);
         this._lastTaskIndex++;
       });
-
+s
     if (this._lastTaskIndex === this._tasks.length) {
       this._removeLoadMoreButton();
     }

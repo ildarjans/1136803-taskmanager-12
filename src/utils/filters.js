@@ -43,4 +43,3 @@ export function getFilterTitlesArray(tasks) {
   });
   return tasksFilter;
 }
-

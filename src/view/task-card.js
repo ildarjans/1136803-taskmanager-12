@@ -1,11 +1,22 @@
-import {getDeadlineDateString, getDeadlineTimeString} from '../utilities.js';
+import {getDeadlineDateString, getDeadlineTimeString} from '../utils/common.js';
 import {dateFormatOptions, timeFormatOptions} from '../consts.js';
-import {createDOMElement} from '../render.js';
+import AbstractView from './Abstract.js';
 
-export default class TaskView {
+export default class TaskView extends AbstractView {
   constructor(task) {
-    this._element = null;
+    super();
     this._task = task;
+    this._clickHandler = this._clickHandler.bind(this);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.click();
+  }
+
+  setClickHandler(cb) {
+    this._callbacks.click = cb;
+    this.getElement().addEventListener(`click`, this._clickHandler);
   }
 
   _getTemplate() {
@@ -75,18 +86,6 @@ export default class TaskView {
       </div>
     </article>`
     );
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createDOMElement(this._getTemplate());
-    }
-
-    return this._element;
-  }
-
-  resetElement() {
-    this._element = null;
   }
 }
 

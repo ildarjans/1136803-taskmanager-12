@@ -1,6 +1,28 @@
-import {createDOMElement} from '../render.js';
-import {getDeadlineDateString} from '../utilities.js';
+import AbstractView from './Abstract.js';
+import {getDeadlineDateString} from '../utils/common.js';
 import {extendedDateFormatOptions, COLORS} from '../consts.js';
+
+export default class TaskEditView extends AbstractView {
+  constructor(task) {
+    super();
+    this._task = task;
+    this._ecsapeHandler = this._ecsapeHandler.bind(this);
+  }
+
+  _ecsapeHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.escape();
+  }
+
+  setEscapeHandler(cb) {
+    this._callbacks.escape = cb;
+    this.getElement().addEventListener(`submit`, this._ecsapeHandler);
+  }
+
+  _getTemplate() {
+    return createEditCardTemplate(this._task);
+  }
+}
 
 function createEditCardTemplate(task) {
   const {
@@ -124,28 +146,4 @@ function createTaskMarkupColorTemplate(selectedColor) {
     >${color}</label
   >`;
   }).join(``);
-}
-
-export default class TaskEditView {
-  constructor(task) {
-    this._element = null;
-    this._task = task;
-  }
-
-  _getTemplate() {
-    return createEditCardTemplate(this._task);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createDOMElement(this._getTemplate());
-    }
-
-    return this._element;
-  }
-
-  resetElement() {
-    this._element = null;
-  }
-
 }

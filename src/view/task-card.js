@@ -1,4 +1,4 @@
-import {getDeadlineDateString, getDeadlineTimeString} from '../utilities.js';
+import {getDeadlineDateString, getDeadlineTimeString} from '../utils/common.js';
 import {dateFormatOptions, timeFormatOptions} from '../consts.js';
 import AbstractView from './Abstract.js';
 

@@ -1,4 +1,4 @@
-import {createDOMElement} from '../render.js';
+import {createDOMElement} from '../utils/render.js';
 
 export default class AbstractView {
   constructor() {

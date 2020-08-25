@@ -3,30 +3,22 @@ import {
   EMPTY_MESSAGE
 } from '../consts.js';
 
-import SiteMenuView from '../view/site-menu.js';
 import MainBoardView from '../view/main-board.js';
 import SortListView from '../view/sort-list.js';
 import TasksBoardView from '../view/tasks-board.js';
-import FiltersView from '../view/tasks-filter.js';
 import LoadMoreButtonView from '../view/load-more-button.js';
 import TaskView from '../view/task-card.js';
 import TaskEditView from '../view/task-edit-card.js';
 import EmptyBoardNotificationView from '../view/empty-board-message.js';
 import {
-  getFilterTitlesArray
-} from '../mock/filters.js';
-import {
   renderLastPlaceElement,
-  getAbstractClassDOMElement
-} from '../render.js';
+  replaceDOMElement,
+} from '../utils/render.js';
 
 export default class BoardPresenter {
-  constructor(mainContainer, menuContainer) {
+  constructor(mainContainer) {
     this._mainContainer = mainContainer;
-    this._menuContainer = menuContainer;
     this._tasks = null;
-    this._filters = null;
-    this._siteMenu = new SiteMenuView();
     this._mainBoard = new MainBoardView();
     this._sortList = new SortListView();
     this._taskBoard = new TasksBoardView();
@@ -38,12 +30,11 @@ export default class BoardPresenter {
 
   init(tasks) {
     this._tasks = tasks;
-    this._renderSiteMenu();
-    this._renderFilters();
     this._renderMainBoard();
 
     if (this._tasks.length === 0) {
       this._renderNotification();
+      return;
     }
 
     this._renderTaskSlice();
@@ -63,16 +54,6 @@ export default class BoardPresenter {
     renderLastPlaceElement(this._mainBoard, this._taskBoard);
   }
 
-  _renderSiteMenu() {
-    renderLastPlaceElement(this._menuContainer, this._siteMenu);
-  }
-
-  _renderFilters() {
-    const filterTitles = getFilterTitlesArray(this._tasks);
-    this._filters = new FiltersView(filterTitles);
-    renderLastPlaceElement(this._mainContainer, this._filters);
-  }
-
   _renderNotification() {
     renderLastPlaceElement(this._mainBoard, this._emptyBoardNotification);
   }
@@ -81,27 +62,15 @@ export default class BoardPresenter {
     const taskCard = new TaskView(task);
     const taskEditCard = new TaskEditView(task);
 
-    container = getAbstractClassDOMElement(container);
-
     renderLastPlaceElement(container, taskCard);
 
     function switchToEditForm() {
-      container
-        .getElement()
-        .replaceChild(
-            taskEditCard.getElement(),
-            taskCard.getElement()
-        );
+      replaceDOMElement(taskEditCard, taskCard);
       window.addEventListener(`keydown`, windowEscapeHandler);
     }
 
     function switchToCard() {
-      container
-        .getElement()
-        .replaceChild(
-            taskCard.getElement(),
-            taskEditCard.getElement()
-        );
+      replaceDOMElement(taskCard, taskEditCard);
       window.removeEventListener(`keydown`, windowEscapeHandler);
     }
 
@@ -138,9 +107,14 @@ export default class BoardPresenter {
         this._renderTaskComponent(this._taskBoard, task);
         this._lastTaskIndex++;
       });
-s
+
     if (this._lastTaskIndex === this._tasks.length) {
       this._removeLoadMoreButton();
     }
   }
+
+  _clearTaskBoard() {
+    this._taskBoard.getElement().innerHTML = ``;
+  }
+
 }

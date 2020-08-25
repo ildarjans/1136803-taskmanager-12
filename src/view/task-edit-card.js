@@ -1,5 +1,5 @@
 import AbstractView from './Abstract.js';
-import {getDeadlineDateString} from '../utilities.js';
+import {getDeadlineDateString} from '../utils/common.js';
 import {extendedDateFormatOptions, COLORS} from '../consts.js';
 
 export default class TaskEditView extends AbstractView {

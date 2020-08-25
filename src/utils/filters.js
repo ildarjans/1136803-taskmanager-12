@@ -1,4 +1,4 @@
-import {isSameDay} from '../utilities.js';
+import {isSameDay} from './common.js';
 
 const filterTitles = [
   `all`,
@@ -43,3 +43,4 @@ export function getFilterTitlesArray(tasks) {
   });
   return tasksFilter;
 }
+

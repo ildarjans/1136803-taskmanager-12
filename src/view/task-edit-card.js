@@ -6,17 +6,30 @@ export default class TaskEditView extends AbstractView {
   constructor(task) {
     super();
     this._task = task;
-    this._ecsapeHandler = this._ecsapeHandler.bind(this);
+    this._windowEcsapeHandler = this._windowEcsapeHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
-  _ecsapeHandler(evt) {
+  _windowEcsapeHandler(evt) {
     evt.preventDefault();
-    this._callbacks.escape();
+    if (evt.key === `Escape`) {
+      this._callbacks.escapeKeyDown();
+    }
   }
 
-  setEscapeHandler(cb) {
-    this._callbacks.escape = cb;
-    this.getElement().addEventListener(`submit`, this._ecsapeHandler);
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.formSubmit();
+  }
+
+  setWindowEscapeHandler(cb) {
+    this._callbacks.escapeKeyDown = cb;
+    this.getElement().addEventListener(`keydown`, this._windowEcsapeHandler);
+
+  }
+  setFormSubmitHandler(cb) {
+    this._callbacks.formSubmit = cb;
+    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 
   _getTemplate() {

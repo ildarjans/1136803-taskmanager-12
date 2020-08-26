@@ -29,7 +29,14 @@ function isTaskRepeating(schedule) {
   return Object.keys(schedule).some((day) => schedule[day]);
 }
 
+function generateFakeId() {
+  const a = getRandomInteger(Date.now()).toString(16);
+  const b = getRandomInteger(Date.now()).toString(16);
+  return `${a}${b}`;
+}
+
 export function getRandomTask() {
+  const id = generateFakeId();
   const description = getRandomArrayElement(descriptions);
   const color = getRandomArrayElement(COLORS);
   const isFavorite = Boolean(getRandomInteger(1));
@@ -49,6 +56,7 @@ export function getRandomTask() {
     getDeadlineDate();
 
   return {
+    id,
     description,
     color,
     isFavorite,

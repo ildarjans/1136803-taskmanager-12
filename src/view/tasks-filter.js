@@ -1,4 +1,4 @@
-import {createDOMElement} from '../render.js';
+import AbstractView from './Abstract.js';
 
 function createFiltersTemplate(filterTitles) {
   return (
@@ -28,24 +28,13 @@ function createFilterContent(filters) {
   }).join(``);
 }
 
-export default class Filters {
+export default class FiltersView extends AbstractView {
   constructor(titles) {
-    this._element = null;
+    super();
     this._titles = titles;
   }
 
-  _getFiltersTemplate() {
+  _getTemplate() {
     return createFiltersTemplate(this._titles);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createDOMElement(this._getFiltersTemplate());
-    }
-    return this._element;
-  }
-
-  resetElement() {
-    this._element = null;
   }
 }

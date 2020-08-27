@@ -1,4 +1,4 @@
-import {isSameDay} from '../utilities.js';
+import {isSameDay} from './common.js';
 
 const filterTitles = [
   `all`,

@@ -1,6 +1,6 @@
-import {createDOMElement} from '../render.js';
+import {createDOMElement} from '../utils/render.js';
 
-export default class EmptyBoardMessageView {
+export default class EmptyBoardNotificationView {
   constructor(message) {
     this._element = null;
     this._message = message;

@@ -1,8 +1,26 @@
-import {createDOMElement} from '../render.js';
-
-export default class LoadMoreButtonView {
+import AbstractView from './Abstract.js';
+export default class LoadMoreButtonView extends AbstractView {
   constructor() {
-    this._element = null;
+    super();
+    this._clickHandler = this._clickHandler.bind(this);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.click();
+  }
+
+  setClickHandler(cb) {
+    this._callbacks.click = cb;
+    this
+      .getElement()
+      .addEventListener(`click`, this._clickHandler);
+  }
+
+  removeClickHandler() {
+    this
+    .getElement()
+    .removeEventListener(`click`, this._clickHandler);
   }
 
   _getTemplate() {
@@ -14,16 +32,5 @@ export default class LoadMoreButtonView {
         load more
       </button>`
     );
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createDOMElement(this._getTemplate());
-    }
-    return this._element;
-  }
-
-  resetElement() {
-    this._element = null;
   }
 }

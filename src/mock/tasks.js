@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomArrayElement} from '../utilities.js';
+import {getRandomInteger, getRandomArrayElement} from '../utils/common.js';
 import {COLORS} from '../consts.js';
 
 // use here coz it's only for this mock module

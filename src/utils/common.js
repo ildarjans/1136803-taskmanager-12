@@ -23,4 +23,3 @@ export function isSameDay(date1, date2) {
   );
 }
 
-

@@ -23,17 +23,19 @@ export default class TaskView extends AbstractView {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
-    this._callbacks.favoriveClick();
+    this._callbacks.favoriteClick();
   }
 
   setEditClickHandler(cb) {
     this._callbacks.editClick = cb;
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, this._editClickHandler);
   }
+
   setArchiveClickHandler(cb) {
     this._callbacks.archiveClick = cb;
     this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, this._archiveClickHandler);
   }
+
   setFavoriteClickHandler(cb) {
     this._callbacks.favoriteClick = cb;
     this.getElement().querySelector(`.card__btn--favorites`).addEventListener(`click`, this._favoriteClickHandler);
@@ -107,6 +109,7 @@ export default class TaskView extends AbstractView {
     </article>`
     );
   }
+
 }
 
 

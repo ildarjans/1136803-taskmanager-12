@@ -1,11 +1,13 @@
 import AbstractView from './Abstract.js';
 import {getDeadlineDateString} from '../utils/common.js';
-import {extendedDateFormatOptions, COLORS} from '../consts.js';
+import {extendedDateFormatOptions, COLORS, dateFormatOptions} from '../consts.js';
+import {isTaskRepeating} from '../utils/tasks.js';
+
 
 export default class TaskEditView extends AbstractView {
   constructor(task) {
     super();
-    this._task = task;
+    this._data = TaskEditView.parseTaskToData(task);
     this._windowEcsapeHandler = this._windowEcsapeHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
@@ -22,18 +24,54 @@ export default class TaskEditView extends AbstractView {
     this._callbacks.formSubmit();
   }
 
-  setWindowEscapeHandler(cb) {
+  setDocumentEscapeHandler(cb) {
     this._callbacks.escapeKeyDown = cb;
     this.getElement().addEventListener(`keydown`, this._windowEcsapeHandler);
 
   }
+
   setFormSubmitHandler(cb) {
     this._callbacks.formSubmit = cb;
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 
   _getTemplate() {
-    return createEditCardTemplate(this._task);
+    return createEditCardTemplate(this._data);
+  }
+
+  static parseTaskToData(task) {
+    return Object.assign(
+        task,
+        {
+          hasDateDue: task.dueDate !== null,
+          isRepeating: isTaskRepeating(task.repeating)
+        }
+    );
+  }
+
+  static parseDataToTask(data) {
+
+    if (!data.hasDateDue) {
+      data.dueDate = null;
+    }
+
+    if (!data.isRepeating) {
+      data.repeating = {
+        'mo': false,
+        'tu': false,
+        'we': false,
+        'th': false,
+        'fr': false,
+        'sa': false,
+        'su': false
+      };
+    }
+
+    delete data.hasDateDue;
+    delete data.isRepeating;
+
+    return data;
+
   }
 }
 
@@ -41,15 +79,13 @@ function createEditCardTemplate(task) {
   const {
     description,
     color,
-    repeatingDays,
+    repeating,
+    isRepeating,
+    hasDateDue,
     dueDate,
   } = task;
 
-  const deadlineDate = dueDate ? getDeadlineDateString(dueDate, extendedDateFormatOptions) : ``;
-  const isRepeatTask = dueDate ? `no` : `yes`;
-  const hasDeadline = dueDate ? `yes` : `no`;
-  const deadlineFieldsStatus = dueDate ? `` : `disabled`;
-  const daysRepeatFieldsStatus = dueDate ? `disabled` : ``;
+  const deadlineDate = hasDateDue ? getDeadlineDateString(dueDate, extendedDateFormatOptions) : ``;
 
   return (
     `<article class="card card--edit card--${color}">
@@ -76,10 +112,10 @@ function createEditCardTemplate(task) {
           <div class="card__details">
             <div class="card__dates">
               <button class="card__date-deadline-toggle" type="button">
-                date: <span class="card__date-status">${hasDeadline}</span>
+                date: <span class="card__date-status">${hasDateDue ? `yes` : `no`}</span>
               </button>
 
-              <fieldset class="card__date-deadline" ${deadlineFieldsStatus}>
+              <fieldset class="card__date-deadline" ${hasDateDue ? `` : `disabled`}>
                 <label class="card__input-deadline-wrap">
                   <input
                     class="card__date"
@@ -95,12 +131,12 @@ function createEditCardTemplate(task) {
                 type="button"
                 class="card__repeat-toggle"
               >
-                repeat:<span class="card__repeat-status">${isRepeatTask}</span>
+                repeat:<span class="card__repeat-status">${isRepeating ? `yes` : `no`}</span>
               </button>
 
-              <fieldset class="card__repeat-days" ${daysRepeatFieldsStatus}>
+              <fieldset class="card__repeat-days" ${hasDateDue ? `disabled` : ``}>
                 <div class="card__repeat-days-inner">
-                  ${createDayRepeatingTemplate(repeatingDays)}
+                  ${createDayRepeatingTemplate(repeating)}
                 </div>
               </fieldset>
             </div>
@@ -124,8 +160,8 @@ function createEditCardTemplate(task) {
   );
 }
 
-function createDayRepeatingTemplate(repeatingDays) {
-  return Object.entries(repeatingDays).map((day) => {
+function createDayRepeatingTemplate(repeating) {
+  return Object.entries(repeating).map((day) => {
     return `\
     <input
       class="visually-hidden card__repeat-day-input"

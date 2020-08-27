@@ -35,6 +35,8 @@ export default class BoardPresenter {
 
   init(tasks) {
     this._tasks = tasks;
+    this._sourcedTasks = tasks;
+
     this._renderMainBoard();
 
     if (this._tasks.length === 0) {
@@ -92,8 +94,8 @@ export default class BoardPresenter {
   }
 
   _renderTask(task) {
-    const taskPresenter = new TaskPresenter(this._taskBoard);
-    taskPresenter.init(task, this._taskChangeHandler);
+    const taskPresenter = new TaskPresenter(this._taskBoard, this._taskChangeHandler);
+    taskPresenter.init(task);
     this._taskPresenter[task.id] = taskPresenter;
   }
 

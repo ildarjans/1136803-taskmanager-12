@@ -26,6 +26,7 @@ export default class TaskPresenter {
 
   init(task) {
     this._task = task;
+
     const prevTaskComponent = this._taskComponent;
     const prevTaskFormComponent = this._taskFormComponent;
 
@@ -35,7 +36,8 @@ export default class TaskPresenter {
     this._taskComponent.setArchiveClickHandler(this._archiveClickHandler);
     this._taskComponent.setEditClickHandler(this._editClickHandler);
     this._taskComponent.setFavoriteClickHandler(this._favoriteClickHandler);
-    this._taskFormComponent.setWindowEscapeHandler(this._replaceFormToCard);
+
+    this._taskFormComponent.setDocumentEscapeHandler(this._replaceFormToCard);
     this._taskFormComponent.setFormSubmitHandler(this._replaceFormToCard);
 
     if (!prevTaskComponent || !prevTaskFormComponent) {
@@ -43,11 +45,11 @@ export default class TaskPresenter {
       return;
     }
 
-    if (isParentContainElement(this._taskListContainer, this._taskComponent)) {
+    if (isParentContainElement(this._taskListContainer, prevTaskComponent)) {
       replaceDOMElement(this._taskComponent, prevTaskComponent);
     }
 
-    if (isParentContainElement(this._taskListContainer, this._taskFormComponent)) {
+    if (isParentContainElement(this._taskListContainer, prevTaskFormComponent)) {
       replaceDOMElement(this._taskFormComponent, prevTaskFormComponent);
     }
 
@@ -59,19 +61,18 @@ export default class TaskPresenter {
   _archiveClickHandler() {
     this._changeData(
         Object.assign(
-            {},
             this._task,
             {
               isArchive: !this._task.isArchive
             }
         )
     );
+    window.console.log(this._task);
   }
 
   _favoriteClickHandler() {
     this._changeData(
         Object.assign(
-            {},
             this._task,
             {
               isFavorite: !this._task.isFavorite

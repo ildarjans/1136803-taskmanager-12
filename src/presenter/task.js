@@ -6,11 +6,17 @@ import {
   removeElement,
   isParentContainElement
 } from '../utils/render.js';
+const mode = {
+  DEFAULT: `DEFAULT`,
+  EDIT: `EDIT`
+};
 
 export default class TaskPresenter {
-  constructor(taskListContainer, changeData) {
+  constructor(taskListContainer, changeData, changeMode) {
     this._taskListContainer = taskListContainer;
     this._changeData = changeData;
+    this._changeMode = changeMode;
+    this._mode = mode.DEFAULT;
     this._task = null;
 
     this._taskComponent = null;
@@ -37,21 +43,28 @@ export default class TaskPresenter {
     this._taskComponent.setEditClickHandler(this._editClickHandler);
     this._taskComponent.setFavoriteClickHandler(this._favoriteClickHandler);
 
-    this._taskFormComponent.setDocumentEscapeHandler(this._replaceFormToCard);
-    this._taskFormComponent.setFormSubmitHandler(this._replaceFormToCard);
+    this._taskFormComponent.setFormSubmitHandler(this._formSubmitClickHandler);
 
     if (!prevTaskComponent || !prevTaskFormComponent) {
       renderLastPlaceElement(this._taskListContainer, this._taskComponent);
       return;
     }
 
-    if (isParentContainElement(this._taskListContainer, prevTaskComponent)) {
+    if (this._mode === mode.DEFAULT) {
       replaceDOMElement(this._taskComponent, prevTaskComponent);
     }
 
-    if (isParentContainElement(this._taskListContainer, prevTaskFormComponent)) {
+    if (this._mode === mode.EDIT) {
       replaceDOMElement(this._taskFormComponent, prevTaskFormComponent);
     }
+
+    // if (isParentContainElement(this._taskListContainer, prevTaskComponent)) {
+    //   replaceDOMElement(this._taskComponent, prevTaskComponent);
+    // }
+
+    // if (isParentContainElement(this._taskListContainer, prevTaskFormComponent)) {
+    //   replaceDOMElement(this._taskFormComponent, prevTaskFormComponent);
+    // }
 
     removeElement(prevTaskComponent);
     removeElement(prevTaskFormComponent);
@@ -88,27 +101,36 @@ export default class TaskPresenter {
   _documentEscapeHandler(evt) {
     if (evt.key === `Escape`) {
       evt.preventDefault();
+      this._taskFormComponent.reset(this._task);
       this._replaceFormToCard();
     }
   }
 
   _formSubmitClickHandler(task) {
     this._changeData(task);
+    this._replaceFormToCard();
   }
 
   _replaceCardToForm() {
-    // evt.preventDefault();
     replaceDOMElement(this._taskFormComponent, this._taskComponent);
     document.addEventListener(`keydown`, this._documentEscapeHandler);
+    this._changeMode();
+    this._mode = mode.EDIT;
   }
 
   _replaceFormToCard() {
-    // evt.preventDefault();
     replaceDOMElement(this._taskComponent, this._taskFormComponent);
     document.removeEventListener(`keydown`, this._documentEscapeHandler);
+    this._mode = mode.DEFAULT;
   }
 
-  reset() {
+  resetView() {
+    if (this._mode === mode.EDIT) {
+      this._replaceFormToCard();
+    }
+  }
+
+  resetTask() {
     removeElement(this._taskComponent);
     removeElement(this._taskFormComponent);
   }

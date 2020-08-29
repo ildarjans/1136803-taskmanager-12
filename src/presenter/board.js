@@ -31,6 +31,7 @@ export default class BoardPresenter {
 
     // TaskChangeHandlers
     this._taskChangeHandler = this._taskChangeHandler.bind(this);
+    this._modeChangeHandler = this._modeChangeHandler.bind(this);
   }
 
   init(tasks) {
@@ -50,7 +51,12 @@ export default class BoardPresenter {
     if (this._tasks.length > this._lastTaskIndex) {
       this._renderLoadMoreButton();
     }
+  }
 
+  _modeChangeHandler() {
+    Object
+      .values(this._taskPresenter)
+      .forEach((presenter) => presenter.resetView());
   }
 
   _renderMainBoard() {
@@ -94,7 +100,11 @@ export default class BoardPresenter {
   }
 
   _renderTask(task) {
-    const taskPresenter = new TaskPresenter(this._taskBoard, this._taskChangeHandler);
+    const taskPresenter = new TaskPresenter(
+        this._taskBoard,
+        this._taskChangeHandler,
+        this._modeChangeHandler
+    );
     taskPresenter.init(task);
     this._taskPresenter[task.id] = taskPresenter;
   }

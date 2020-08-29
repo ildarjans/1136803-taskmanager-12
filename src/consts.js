@@ -8,9 +8,11 @@ const COLORS = [
   `green`,
   `pink`
 ];
+
 const dateFormatOptions = {
   month: `long`,
 };
+
 const timeFormatOptions = {
   hour: `2-digit`,
   minute: `2-digit`,
@@ -18,7 +20,7 @@ const timeFormatOptions = {
 };
 
 const extendedDateFormatOptions =
-  Object.assign(dateFormatOptions, timeFormatOptions);
+  Object.assign({}, dateFormatOptions, timeFormatOptions);
 
 export {
   dateFormatOptions,

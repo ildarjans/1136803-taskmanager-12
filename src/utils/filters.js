@@ -1,4 +1,5 @@
 import {isSameDay} from './common.js';
+import {isTaskRepeating} from './tasks.js';
 
 const filterTitles = [
   `all`,
@@ -22,11 +23,11 @@ function countTasksFilterProperties(tasks) {
   const today = new Date();
 
   tasks.forEach((task) => {
-    const {isFavorite, isArchive, repeatingDays, dueDate} = task;
+    const {isFavorite, isArchive, repeating, dueDate} = task;
     counter[`favorite`] += isFavorite;
     counter[`archive`] += isArchive;
     counter[`all`] += 1;
-    counter[`repeating`] += Object.keys(repeatingDays).some((key) => repeatingDays[key]);
+    counter[`repeating`] += isTaskRepeating(repeating);
     counter[`overdue`] += today > dueDate;
     counter[`today`] += dueDate ? isSameDay(dueDate, today) : 0;
   });

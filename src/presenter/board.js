@@ -7,18 +7,17 @@ import MainBoardView from '../view/main-board.js';
 import SortListView from '../view/sort-list.js';
 import TasksBoardView from '../view/tasks-board.js';
 import LoadMoreButtonView from '../view/load-more-button.js';
-import TaskView from '../view/task-card.js';
-import TaskEditView from '../view/task-edit-card.js';
 import EmptyBoardNotificationView from '../view/empty-board-message.js';
-import {
-  renderLastPlaceElement,
-  replaceDOMElement,
-} from '../utils/render.js';
+import TaskPresenter from './task.js';
+import {renderLastPlaceElement} from '../utils/render.js';
+import {updateItem} from '../utils/common.js';
+
 
 export default class BoardPresenter {
   constructor(mainContainer) {
     this._mainContainer = mainContainer;
     this._tasks = null;
+    this._sourcedTasks = null; // immutable tasks instance
     this._mainBoard = new MainBoardView();
     this._sortList = new SortListView();
     this._taskBoard = new TasksBoardView();
@@ -26,10 +25,19 @@ export default class BoardPresenter {
     this._emptyBoardNotification = new EmptyBoardNotificationView(EMPTY_MESSAGE);
     this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
     this._lastTaskIndex = 0;
+
+    // {id: presenter}
+    this._taskPresenter = {};
+
+    // TaskChangeHandlers
+    this._taskChangeHandler = this._taskChangeHandler.bind(this);
+    this._modeChangeHandler = this._modeChangeHandler.bind(this);
   }
 
   init(tasks) {
     this._tasks = tasks;
+    this._sourcedTasks = tasks;
+
     this._renderMainBoard();
 
     if (this._tasks.length === 0) {
@@ -43,7 +51,12 @@ export default class BoardPresenter {
     if (this._tasks.length > this._lastTaskIndex) {
       this._renderLoadMoreButton();
     }
+  }
 
+  _modeChangeHandler() {
+    Object
+      .values(this._taskPresenter)
+      .forEach((presenter) => presenter.resetView());
   }
 
   _renderMainBoard() {
@@ -56,33 +69,6 @@ export default class BoardPresenter {
 
   _renderNotification() {
     renderLastPlaceElement(this._mainBoard, this._emptyBoardNotification);
-  }
-
-  _renderTaskComponent(container, task) {
-    const taskCard = new TaskView(task);
-    const taskEditCard = new TaskEditView(task);
-
-    renderLastPlaceElement(container, taskCard);
-
-    function switchToEditForm() {
-      replaceDOMElement(taskEditCard, taskCard);
-      window.addEventListener(`keydown`, windowEscapeHandler);
-    }
-
-    function switchToCard() {
-      replaceDOMElement(taskCard, taskEditCard);
-      window.removeEventListener(`keydown`, windowEscapeHandler);
-    }
-
-    function windowEscapeHandler(evt) {
-      if (evt.key === `Escape`) {
-        switchToCard();
-      }
-    }
-
-    taskCard.setClickHandler(switchToEditForm);
-    taskEditCard.setEscapeHandler(switchToCard);
-
   }
 
   _renderLoadMoreButton() {
@@ -104,7 +90,7 @@ export default class BoardPresenter {
     this._tasks
       .slice(this._lastTaskIndex, sliceStep)
       .forEach((task) => {
-        this._renderTaskComponent(this._taskBoard, task);
+        this._renderTask(task);
         this._lastTaskIndex++;
       });
 
@@ -113,8 +99,29 @@ export default class BoardPresenter {
     }
   }
 
-  _clearTaskBoard() {
-    this._taskBoard.getElement().innerHTML = ``;
+  _renderTask(task) {
+    const taskPresenter = new TaskPresenter(
+        this._taskBoard,
+        this._taskChangeHandler,
+        this._modeChangeHandler
+    );
+    taskPresenter.init(task);
+    this._taskPresenter[task.id] = taskPresenter;
   }
 
+  _taskChangeHandler(updatedTask) {
+    this._tasks = updateItem(this._tasks, updatedTask);
+    this._sourcedTasks = updateItem(this._sourcedTasks, updatedTask);
+    this._taskPresenter[updatedTask.id].init(updatedTask);
+  }
+
+  _clearTaskBoard() {
+    Object
+      .value(this._taskPresenter)
+      .forEach(
+          (presenter) => presenter.reset()
+      );
+    this._taskPresenter = {};
+    this._lastTaskIndex = 0;
+  }
 }

@@ -3,10 +3,10 @@ import TaskEditView from '../view/task-edit-card.js';
 import {
   renderLastPlaceElement,
   replaceDOMElement,
-  removeElement,
-  isParentContainElement
+  removeElement
 } from '../utils/render.js';
-const mode = {
+
+const Mode = {
   DEFAULT: `DEFAULT`,
   EDIT: `EDIT`
 };
@@ -16,7 +16,7 @@ export default class TaskPresenter {
     this._taskListContainer = taskListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
-    this._mode = mode.DEFAULT;
+    this._mode = Mode.DEFAULT;
     this._task = null;
 
     this._taskComponent = null;
@@ -50,21 +50,13 @@ export default class TaskPresenter {
       return;
     }
 
-    if (this._mode === mode.DEFAULT) {
+    if (this._mode === Mode.DEFAULT) {
       replaceDOMElement(this._taskComponent, prevTaskComponent);
     }
 
-    if (this._mode === mode.EDIT) {
+    if (this._mode === Mode.EDIT) {
       replaceDOMElement(this._taskFormComponent, prevTaskFormComponent);
     }
-
-    // if (isParentContainElement(this._taskListContainer, prevTaskComponent)) {
-    //   replaceDOMElement(this._taskComponent, prevTaskComponent);
-    // }
-
-    // if (isParentContainElement(this._taskListContainer, prevTaskFormComponent)) {
-    //   replaceDOMElement(this._taskFormComponent, prevTaskFormComponent);
-    // }
 
     removeElement(prevTaskComponent);
     removeElement(prevTaskFormComponent);
@@ -115,17 +107,17 @@ export default class TaskPresenter {
     replaceDOMElement(this._taskFormComponent, this._taskComponent);
     document.addEventListener(`keydown`, this._documentEscapeHandler);
     this._changeMode();
-    this._mode = mode.EDIT;
+    this._mode = Mode.EDIT;
   }
 
   _replaceFormToCard() {
     replaceDOMElement(this._taskComponent, this._taskFormComponent);
     document.removeEventListener(`keydown`, this._documentEscapeHandler);
-    this._mode = mode.DEFAULT;
+    this._mode = Mode.DEFAULT;
   }
 
   resetView() {
-    if (this._mode === mode.EDIT) {
+    if (this._mode === Mode.EDIT) {
       this._replaceFormToCard();
     }
   }

@@ -1,6 +1,7 @@
 import {
   CARDS_TO_DISPLAY,
-  EMPTY_MESSAGE
+  EMPTY_MESSAGE,
+  SortType,
 } from '../consts.js';
 
 import MainBoardView from '../view/main-board.js';
@@ -11,7 +12,7 @@ import EmptyBoardNotificationView from '../view/empty-board-message.js';
 import TaskPresenter from './task.js';
 import {renderLastPlaceElement} from '../utils/render.js';
 import {updateItem} from '../utils/common.js';
-
+import {sortTasksAscOrder, sortTasksDescOrder} from '../utils/tasks.js';
 
 export default class BoardPresenter {
   constructor(mainContainer) {
@@ -23,15 +24,16 @@ export default class BoardPresenter {
     this._taskBoard = new TasksBoardView();
     this._loadMoreBtn = null;
     this._emptyBoardNotification = new EmptyBoardNotificationView(EMPTY_MESSAGE);
-    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
     this._lastTaskIndex = 0;
 
     // {id: presenter}
     this._taskPresenter = {};
 
-    // TaskChangeHandlers
+    // Bind Handlers
     this._taskChangeHandler = this._taskChangeHandler.bind(this);
     this._modeChangeHandler = this._modeChangeHandler.bind(this);
+    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
+    this._sortByTypeClickHandler = this._sortByTypeClickHandler.bind(this);
   }
 
   init(tasks) {
@@ -45,11 +47,43 @@ export default class BoardPresenter {
       return;
     }
 
+    this._renderSortList();
     this._renderTaskSlice();
     this._renderTaskBoard();
 
     if (this._tasks.length > this._lastTaskIndex) {
       this._renderLoadMoreButton();
+    }
+  }
+
+  _renderSortList() {
+    renderLastPlaceElement(this._mainBoard, this._sortList);
+    this._sortList.setSortClickHandler(this._sortByTypeClickHandler);
+  }
+
+  _sortByTypeClickHandler(sortType) {
+    this._sortTasksList(sortType);
+    this._renderSortedTaskSlice();
+  }
+
+  _renderSortedTaskSlice() {
+    const lastIndex = this._lastTaskIndex;
+    this._clearTaskBoard();
+    this._tasks
+      .slice(0, lastIndex)
+      .forEach((task) => this._renderTask(task));
+  }
+
+  _sortTasksList(order) {
+    switch (order) {
+      case SortType.ASC:
+        this._tasks.sort(sortTasksAscOrder);
+        break;
+      case SortType.DESC:
+        this._tasks.sort(sortTasksDescOrder);
+        break;
+      default:
+        this._tasks = this._sourcedTasks.slice();
     }
   }
 
@@ -89,10 +123,7 @@ export default class BoardPresenter {
     const sliceStep = this._lastTaskIndex + CARDS_TO_DISPLAY;
     this._tasks
       .slice(this._lastTaskIndex, sliceStep)
-      .forEach((task) => {
-        this._renderTask(task);
-        this._lastTaskIndex++;
-      });
+      .forEach((task) => this._renderTask(task));
 
     if (this._lastTaskIndex === this._tasks.length) {
       this._removeLoadMoreButton();
@@ -107,6 +138,7 @@ export default class BoardPresenter {
     );
     taskPresenter.init(task);
     this._taskPresenter[task.id] = taskPresenter;
+    this._lastTaskIndex++;
   }
 
   _taskChangeHandler(updatedTask) {
@@ -117,10 +149,8 @@ export default class BoardPresenter {
 
   _clearTaskBoard() {
     Object
-      .value(this._taskPresenter)
-      .forEach(
-          (presenter) => presenter.reset()
-      );
+      .values(this._taskPresenter)
+      .forEach((presenter) => presenter.resetTask());
     this._taskPresenter = {};
     this._lastTaskIndex = 0;
   }

@@ -30,9 +30,5 @@ export function updateItem(items, update) {
     return items;
   }
 
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1)
-  ];
+  return items.splice(0, 1, index);
 }

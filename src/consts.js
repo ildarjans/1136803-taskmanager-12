@@ -22,6 +22,12 @@ const timeFormatOptions = {
 const extendedDateFormatOptions =
   Object.assign({}, dateFormatOptions, timeFormatOptions);
 
+const SortType = {
+  DEFAULT: `default`,
+  DESC: `date-down`,
+  ASC: `date-up`,
+};
+
 export {
   dateFormatOptions,
   timeFormatOptions,
@@ -29,6 +35,6 @@ export {
   CARDS_TO_DISPLAY,
   TASKS_LENGTH,
   COLORS,
-  EMPTY_MESSAGE
+  EMPTY_MESSAGE,
+  SortType
 };
-

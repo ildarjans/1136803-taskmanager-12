@@ -72,7 +72,6 @@ export default class TaskPresenter {
             }
         )
     );
-    window.console.log(this._task);
   }
 
   _favoriteClickHandler() {

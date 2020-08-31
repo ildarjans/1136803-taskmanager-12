@@ -52,6 +52,7 @@ export default class TaskEditView extends Smart {
 
     delete data.hasDateDue;
     delete data.isRepeating;
+    
 
     return data;
 

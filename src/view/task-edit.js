@@ -21,44 +21,6 @@ export default class TaskEditView extends SmartView {
 
   }
 
-  static parseTaskToData(task) {
-    return Object.assign(
-        {},
-        task,
-        {
-          hasDateDue: task.dueDate !== null,
-          isRepeating: isTaskRepeating(task.repeating)
-        }
-    );
-  }
-
-  static parseDataToTask(data) {
-
-    if (!data.hasDateDue) {
-      data.dueDate = null;
-    }
-
-    if (!data.isRepeating) {
-      data.repeating = {
-        'mo': false,
-        'tu': false,
-        'we': false,
-        'th': false,
-        'fr': false,
-        'sa': false,
-        'su': false
-      };
-    }
-
-    delete data.hasDateDue;
-    delete data.isRepeating;
-    
-
-    return data;
-
-  }
-
-
   setFormSubmitHandler(cb) {
     this._callbacks.formSubmit = cb;
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
@@ -137,12 +99,49 @@ export default class TaskEditView extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callbacks.formSubmit(TaskEditView.parseTaskToData(this._data));
+    this._callbacks.formSubmit(TaskEditView.parseDataToTask(this._data));
   }
 
   _getTemplate() {
     return createEditCardTemplate(this._data);
   }
+
+  static parseTaskToData(task) {
+    return Object.assign(
+        {},
+        task,
+        {
+          hasDateDue: task.dueDate !== null,
+          isRepeating: isTaskRepeating(task.repeating)
+        }
+    );
+  }
+
+  static parseDataToTask(data) {
+
+    if (!data.hasDateDue) {
+      data.dueDate = null;
+    }
+
+    if (!data.isRepeating) {
+      data.repeating = {
+        'mo': false,
+        'tu': false,
+        'we': false,
+        'th': false,
+        'fr': false,
+        'sa': false,
+        'su': false
+      };
+    }
+
+    delete data.hasDateDue;
+    delete data.isRepeating;
+
+    return data;
+
+  }
+
 
 }
 

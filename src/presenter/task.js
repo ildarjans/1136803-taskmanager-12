@@ -1,5 +1,5 @@
-import TaskView from '../view/task-card.js';
-import TaskEditView from '../view/task-edit-card.js';
+import TaskView from '../view/task.js';
+import TaskEditView from '../view/task-edit.js';
 import {
   renderLastPlaceElement,
   replaceDOMElement,
@@ -22,7 +22,7 @@ export default class TaskPresenter {
     this._taskComponent = null;
     this._taskFormComponent = null;
 
-    // handlers [edit, submit, escape(close)]
+    // handlers
     this._archiveClickHandler = this._archiveClickHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);

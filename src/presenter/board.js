@@ -23,13 +23,13 @@ export default class BoardPresenter {
     this._taskBoard = new TasksBoardView();
     this._loadMoreBtn = null;
     this._emptyBoardNotification = new EmptyBoardNotificationView(EMPTY_MESSAGE);
-    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
     this._lastTaskIndex = 0;
 
     // {id: presenter}
     this._taskPresenter = {};
 
     // TaskChangeHandlers
+    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
     this._taskChangeHandler = this._taskChangeHandler.bind(this);
     this._modeChangeHandler = this._modeChangeHandler.bind(this);
   }

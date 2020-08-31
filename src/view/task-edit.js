@@ -1,10 +1,10 @@
-import Smart from './smart.js';
+import SmartView from './smart.js';
 import {getDeadlineDateString} from '../utils/common.js';
 import {extendedDateFormatOptions, COLORS} from '../consts.js';
 import {isTaskRepeating} from '../utils/tasks.js';
 
 
-export default class TaskEditView extends Smart {
+export default class TaskEditView extends SmartView {
   constructor(task) {
     super();
     this._data = TaskEditView.parseTaskToData(task);
@@ -20,43 +20,6 @@ export default class TaskEditView extends Smart {
     this._setInnerHandlers();
 
   }
-
-  static parseTaskToData(task) {
-    return Object.assign(
-        {},
-        task,
-        {
-          hasDateDue: task.dueDate !== null,
-          isRepeating: isTaskRepeating(task.repeating)
-        }
-    );
-  }
-
-  static parseDataToTask(data) {
-
-    if (!data.hasDateDue) {
-      data.dueDate = null;
-    }
-
-    if (!data.isRepeating) {
-      data.repeating = {
-        'mo': false,
-        'tu': false,
-        'we': false,
-        'th': false,
-        'fr': false,
-        'sa': false,
-        'su': false
-      };
-    }
-
-    delete data.hasDateDue;
-    delete data.isRepeating;
-
-    return data;
-
-  }
-
 
   setFormSubmitHandler(cb) {
     this._callbacks.formSubmit = cb;
@@ -136,12 +99,49 @@ export default class TaskEditView extends Smart {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callbacks.formSubmit(TaskEditView.parseTaskToData(this._data));
+    this._callbacks.formSubmit(TaskEditView.parseDataToTask(this._data));
   }
 
   _getTemplate() {
     return createEditCardTemplate(this._data);
   }
+
+  static parseTaskToData(task) {
+    return Object.assign(
+        {},
+        task,
+        {
+          hasDateDue: task.dueDate !== null,
+          isRepeating: isTaskRepeating(task.repeating)
+        }
+    );
+  }
+
+  static parseDataToTask(data) {
+
+    if (!data.hasDateDue) {
+      data.dueDate = null;
+    }
+
+    if (!data.isRepeating) {
+      data.repeating = {
+        'mo': false,
+        'tu': false,
+        'we': false,
+        'th': false,
+        'fr': false,
+        'sa': false,
+        'su': false
+      };
+    }
+
+    delete data.hasDateDue;
+    delete data.isRepeating;
+
+    return data;
+
+  }
+
 
 }
 

@@ -29,7 +29,12 @@ export default class BoardPresenter {
     // {id: presenter}
     this._taskPresenter = {};
 
+<<<<<<< HEAD
     // Bind Handlers
+=======
+    // TaskChangeHandlers
+    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
+>>>>>>> 9f73f3562b85cecb59ed6134a8d217cca5852c1a
     this._taskChangeHandler = this._taskChangeHandler.bind(this);
     this._modeChangeHandler = this._modeChangeHandler.bind(this);
     this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);

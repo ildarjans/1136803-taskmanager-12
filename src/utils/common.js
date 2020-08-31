@@ -30,5 +30,11 @@ export function updateItem(items, update) {
     return items;
   }
 
+<<<<<<< HEAD
   return items.splice(0, 1, index);
+=======
+  items.splice(index, 1, update);
+
+  return items;
+>>>>>>> 9f73f3562b85cecb59ed6134a8d217cca5852c1a
 }

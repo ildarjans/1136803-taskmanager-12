@@ -1,10 +1,10 @@
-import Smart from './smart.js';
+import SmartView from './smart.js';
 import {getDeadlineDateString} from '../utils/common.js';
 import {extendedDateFormatOptions, COLORS} from '../consts.js';
 import {isTaskRepeating} from '../utils/tasks.js';
 
 
-export default class TaskEditView extends Smart {
+export default class TaskEditView extends SmartView {
   constructor(task) {
     super();
     this._data = TaskEditView.parseTaskToData(task);

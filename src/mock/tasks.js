@@ -1,5 +1,6 @@
 import {getRandomInteger, getRandomArrayElement} from '../utils/common.js';
 import {COLORS} from '../consts.js';
+import {isTaskRepeating} from '../utils/tasks.js';
 
 // use here coz it's only for this mock module
 const MAX_DAY_DEVIATION = 7;
@@ -25,16 +26,19 @@ function getDeadlineDate() {
   return newDate;
 }
 
-function isTaskRepeating(schedule) {
-  return Object.keys(schedule).some((day) => schedule[day]);
+function generateId() {
+  const a = getRandomInteger(Date.now()).toString(16);
+  const b = getRandomInteger(Date.now()).toString(16);
+  return `${a}${b}`;
 }
 
 export function getRandomTask() {
+  const id = generateId();
   const description = getRandomArrayElement(descriptions);
   const color = getRandomArrayElement(COLORS);
   const isFavorite = Boolean(getRandomInteger(1));
   const isArchive = Boolean(getRandomInteger(1));
-  const repeatingDays = {
+  const repeating = {
     'mo': Boolean(getRandomInteger(1)),
     'tu': false,
     'we': false,
@@ -44,16 +48,17 @@ export function getRandomTask() {
     'su': false
   };
 
-  const dueDate = isTaskRepeating(repeatingDays) ?
+  const dueDate = isTaskRepeating(repeating) ?
     null :
     getDeadlineDate();
 
   return {
+    id,
     description,
     color,
     isFavorite,
     isArchive,
-    repeatingDays,
+    repeating,
     dueDate,
   };
 }

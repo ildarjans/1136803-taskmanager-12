@@ -26,19 +26,10 @@ export default class BoardPresenter {
     this._emptyBoardNotification = new EmptyBoardNotificationView(EMPTY_MESSAGE);
     this._lastTaskIndex = 0;
 
-    // {id: presenter}
     this._taskPresenter = {};
 
-<<<<<<< HEAD
-    // Bind Handlers
-=======
-    // TaskChangeHandlers
-    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
->>>>>>> 9f73f3562b85cecb59ed6134a8d217cca5852c1a
-    this._taskChangeHandler = this._taskChangeHandler.bind(this);
-    this._modeChangeHandler = this._modeChangeHandler.bind(this);
-    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
-    this._sortByTypeClickHandler = this._sortByTypeClickHandler.bind(this);
+    this._bindInnerHandlers();
+
   }
 
   init(tasks) {
@@ -59,6 +50,14 @@ export default class BoardPresenter {
     if (this._tasks.length > this._lastTaskIndex) {
       this._renderLoadMoreButton();
     }
+  }
+
+  _bindInnerHandlers() {
+    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
+    this._taskChangeHandler = this._taskChangeHandler.bind(this);
+    this._modeChangeHandler = this._modeChangeHandler.bind(this);
+    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
+    this._sortByTypeClickHandler = this._sortByTypeClickHandler.bind(this);
   }
 
   _renderSortList() {

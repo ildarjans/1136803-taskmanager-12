@@ -1,40 +1,33 @@
-const CARDS_TO_DISPLAY = 8;
-const TASKS_LENGTH = 21;
-const EMPTY_MESSAGE = `Click «ADD NEW TASK» in menu to create your first task`;
-const COLORS = [
+export const CARDS_TO_DISPLAY = 8;
+export const TASKS_LENGTH = 21;
+export const EMPTY_MESSAGE = `Click «ADD NEW TASK» in menu to create your first task`;
+export const COLORS = [
   `black`,
   `yellow`,
   `blue`,
   `green`,
   `pink`
 ];
+export const TaskMode = {
+  DEFAULT: `DEFAULT`,
+  EDIT: `EDIT`
+};
 
-const dateFormatOptions = {
+export const dateFormatOptions = {
   month: `long`,
 };
 
-const timeFormatOptions = {
+export const timeFormatOptions = {
   hour: `2-digit`,
   minute: `2-digit`,
   hour12: false,
 };
 
-const extendedDateFormatOptions =
+export const extendedDateFormatOptions =
   Object.assign({}, dateFormatOptions, timeFormatOptions);
 
-const SortType = {
+export const SortType = {
   DEFAULT: `default`,
   DESC: `date-down`,
   ASC: `date-up`,
-};
-
-export {
-  dateFormatOptions,
-  timeFormatOptions,
-  extendedDateFormatOptions,
-  CARDS_TO_DISPLAY,
-  TASKS_LENGTH,
-  COLORS,
-  EMPTY_MESSAGE,
-  SortType
 };

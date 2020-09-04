@@ -1,13 +1,17 @@
 import SmartView from './smart.js';
-import {getDeadlineDateString} from '../utils/common.js';
-import {extendedDateFormatOptions, COLORS} from '../consts.js';
+import {getTaskDateFormatString} from '../utils/tasks.js';
+import {COLORS} from '../consts.js';
 import {isTaskRepeating} from '../utils/tasks.js';
+import flatpickr from 'flatpickr';
+
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 
 export default class TaskEditView extends SmartView {
   constructor(task) {
     super();
     this._data = TaskEditView.parseTaskToData(task);
+    this._datepicker = null;
 
     this._bindInnerHandlers();
     this._setInnerHandlers();
@@ -20,7 +24,13 @@ export default class TaskEditView extends SmartView {
     this._daysRepeatingHandler = this._daysRepeatingHandler.bind(this);
     this._colorChangeHandler = this._colorChangeHandler.bind(this);
     this._descriptionChangeHandler = this._descriptionChangeHandler.bind(this);
+    this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
+
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+
+    this._setDatepicker();
+    this._setInnerHandlers();
+
   }
 
   setFormSubmitHandler(cb) {
@@ -29,6 +39,7 @@ export default class TaskEditView extends SmartView {
   }
 
   restoreHandlers() {
+    this._setDatepicker();
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callbacks.formSubmit);
   }
@@ -37,7 +48,26 @@ export default class TaskEditView extends SmartView {
     this.updateData(TaskEditView.parseTaskToData(task));
   }
 
+  _setDatepicker() {
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+
+    if (this._data.hasDateDue) {
+      this._datepicker = flatpickr(
+          this.getElement().querySelector(`.card__date`),
+          {
+            dateFormat: `j F`,
+            defaultDate: this._data.dueDate,
+            onChange: this._dueDateChangeHandler
+          }
+      );
+    }
+  }
+
   _setInnerHandlers() {
+
     this.getElement()
       .querySelector(`.card__date-deadline-toggle`)
       .addEventListener(`click`, this._dueDateClickHandler);
@@ -58,6 +88,14 @@ export default class TaskEditView extends SmartView {
       .querySelector(`.card__repeat-days-inner`)
       .addEventListener(`change`, this._daysRepeatingHandler);
 
+  }
+
+  _repeatingClickHandler() {
+    if (!this._data.hasDateDue) {
+      this.updateData({
+        isRepeating: !this._data.isRepeating
+      });
+    }
   }
 
   _daysRepeatingHandler(evt) {
@@ -88,14 +126,16 @@ export default class TaskEditView extends SmartView {
   }
 
   _dueDateClickHandler() {
-    this.updateData({
-      hasDateDue: !this._data.hasDateDue
-    });
+    if (!this._data.isRepeating) {
+      this.updateData({
+        hasDateDue: !this._data.isRepeating ? !this._data.hasDateDue : false
+      });
+    }
   }
 
-  _repeatingClickHandler() {
+  _dueDateChangeHandler(selectedDate) {
     this.updateData({
-      isRepeating: !this._data.isRepeating
+      dueDate: selectedDate[0]
     });
   }
 
@@ -144,7 +184,6 @@ export default class TaskEditView extends SmartView {
 
   }
 
-
 }
 
 
@@ -158,10 +197,10 @@ function createEditCardTemplate(data) {
     dueDate,
   } = data;
 
-  const deadlineDate = dueDate !== null ? getDeadlineDateString(dueDate, extendedDateFormatOptions) : ``;
-  const repeatClass = isRepeating ? `card--repeat` : ``;
+  const isValidDeadlineField = data.hasDateDue && data.dueDate;
+  const isValidRepeatDaysField = data.isRepeating && isTaskRepeating(data.repeating);
   return (
-    `<article class="card card--edit ${repeatClass} card--${color}">
+    `<article class="card card--edit ${isRepeating ? `card--repeat` : ``} card--${color}">
     <form class="card__form" method="get">
       <div class="card__inner">
         <div class="card__color-bar">
@@ -185,17 +224,17 @@ function createEditCardTemplate(data) {
           <div class="card__details">
             <div class="card__dates">
               <button class="card__date-deadline-toggle" type="button">
-                date: <span class="card__date-status">${hasDateDue ? `yes` : `no`}</span>
+                date: <span class="card__date-status">${!isRepeating && hasDateDue ? `yes` : `no`}</span>
               </button>
 
-              <fieldset class="card__date-deadline" ${hasDateDue ? `` : `disabled`}>
+              <fieldset class="card__date-deadline" ${!isRepeating && hasDateDue ? `` : `disabled`}>
                 <label class="card__input-deadline-wrap">
                   <input
                     class="card__date"
                     type="text"
-                    placeholder="23 SEPTEMBER 16:15"
+                    placeholder="23 SEPTEMBER"
                     name="date"
-                    value="${deadlineDate}"
+                    value="${getTaskDateFormatString(dueDate)}"
                   />
                 </label>
               </fieldset>
@@ -207,7 +246,7 @@ function createEditCardTemplate(data) {
                 repeat:<span class="card__repeat-status">${isRepeating ? `yes` : `no`}</span>
               </button>
 
-              <fieldset class="card__repeat-days" ${hasDateDue ? `disabled` : ``}>
+              <fieldset class="card__repeat-days" ${!isRepeating ? `disabled` : ``}>
                 <div class="card__repeat-days-inner">
                   ${isRepeating ? createDayRepeatingTemplate(repeating) : ``}
                 </div>
@@ -224,14 +263,16 @@ function createEditCardTemplate(data) {
         </div>
 
         <div class="card__status-btns">
-          <button class="card__save" type="submit">save</button>
+          <button class="card__save" type="submit"${!isValidDeadlineField && !isValidRepeatDaysField ? `disabled` : ``}>save</button>
           <button class="card__delete" type="button">delete</button>
         </div>
       </div>
     </form>
   </article>`
   );
+
 }
+
 
 function createDayRepeatingTemplate(repeating) {
   return Object.entries(repeating).map((day) => {

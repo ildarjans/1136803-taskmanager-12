@@ -8,23 +8,11 @@ export const COLORS = [
   `green`,
   `pink`
 ];
+
 export const TaskMode = {
   DEFAULT: `DEFAULT`,
   EDIT: `EDIT`
 };
-
-export const dateFormatOptions = {
-  month: `long`,
-};
-
-export const timeFormatOptions = {
-  hour: `2-digit`,
-  minute: `2-digit`,
-  hour12: false,
-};
-
-export const extendedDateFormatOptions =
-  Object.assign({}, dateFormatOptions, timeFormatOptions);
 
 export const SortType = {
   DEFAULT: `default`,

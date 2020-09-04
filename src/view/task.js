@@ -1,5 +1,4 @@
-import {getDeadlineDateString, getDeadlineTimeString} from '../utils/common.js';
-import {dateFormatOptions, timeFormatOptions} from '../consts.js';
+import {getTaskDateFormatString} from '../utils/tasks.js';
 import AbstractView from './Abstract.js';
 
 export default class TaskView extends AbstractView {
@@ -52,9 +51,7 @@ export default class TaskView extends AbstractView {
 
     const isRepeat = dueDate === null ? `card--repeat` : ``;
 
-    const dueDateString = dueDate ? getDeadlineDateString(dueDate, dateFormatOptions) : ``;
-
-    const dueTimeString = dueDate ? getDeadlineTimeString(dueDate, timeFormatOptions) : ``;
+    const dueDateString = dueDate ? getTaskDateFormatString(dueDate) : ``;
 
     const deadlineClass = dueDate && dueDate < new Date() ? `card--deadline` : ``;
 
@@ -98,7 +95,6 @@ export default class TaskView extends AbstractView {
                 <div class="card__date-deadline">
                   <p class="card__input-deadline-wrap">
                     <span class="card__date">${dueDateString}</span>
-                    <span class="card__time">${dueTimeString}</span>
                   </p>
                 </div>
               </div>

@@ -1,5 +1,4 @@
-import {isSameDay} from './common.js';
-import {isTaskRepeating} from './tasks.js';
+import {isTaskRepeating, isSameDay} from './tasks.js';
 
 const filterTitles = [
   `all`,

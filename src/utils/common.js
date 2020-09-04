@@ -29,8 +29,8 @@ export function updateItem(items, update) {
   if (index === -1) {
     return items;
   }
-
   items.splice(index, 1, update);
 
   return items;
+
 }

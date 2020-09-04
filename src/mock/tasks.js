@@ -42,7 +42,7 @@ export function getRandomTask() {
     'mo': Boolean(getRandomInteger(1)),
     'tu': false,
     'we': false,
-    'th': Boolean(getRandomInteger(1)),
+    'th': false,
     'fr': false,
     'sa': false,
     'su': false

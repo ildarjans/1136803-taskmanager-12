@@ -6,10 +6,7 @@ import {
   removeElement
 } from '../utils/render.js';
 
-const Mode = {
-  DEFAULT: `DEFAULT`,
-  EDIT: `EDIT`
-};
+import {TaskMode as Mode} from '../consts.js';
 
 export default class TaskPresenter {
   constructor(taskListContainer, changeData, changeMode) {
@@ -22,12 +19,8 @@ export default class TaskPresenter {
     this._taskComponent = null;
     this._taskFormComponent = null;
 
-    // handlers
-    this._archiveClickHandler = this._archiveClickHandler.bind(this);
-    this._editClickHandler = this._editClickHandler.bind(this);
-    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
-    this._formSubmitClickHandler = this._formSubmitClickHandler.bind(this);
-    this._documentEscapeHandler = this._documentEscapeHandler.bind(this);
+    this._bindInnerHandlers();
+
   }
 
   init(task) {
@@ -39,28 +32,40 @@ export default class TaskPresenter {
     this._taskComponent = new TaskView(task);
     this._taskFormComponent = new TaskEditView(task);
 
-    this._taskComponent.setArchiveClickHandler(this._archiveClickHandler);
-    this._taskComponent.setEditClickHandler(this._editClickHandler);
-    this._taskComponent.setFavoriteClickHandler(this._favoriteClickHandler);
-
-    this._taskFormComponent.setFormSubmitHandler(this._formSubmitClickHandler);
+    this._setInnerHandlers();
 
     if (!prevTaskComponent || !prevTaskFormComponent) {
       renderLastPlaceElement(this._taskListContainer, this._taskComponent);
       return;
     }
 
-    if (this._mode === Mode.DEFAULT) {
-      replaceDOMElement(this._taskComponent, prevTaskComponent);
-    }
-
-    if (this._mode === Mode.EDIT) {
-      replaceDOMElement(this._taskFormComponent, prevTaskFormComponent);
+    switch (this._mode) {
+      case Mode.DEFAULT:
+        replaceDOMElement(this._taskComponent, prevTaskComponent);
+        break;
+      case Mode.EDIT:
+        replaceDOMElement(this._taskFormComponent, prevTaskFormComponent);
+        break;
     }
 
     removeElement(prevTaskComponent);
     removeElement(prevTaskFormComponent);
 
+  }
+
+  _setInnerHandlers() {
+    this._taskComponent.setArchiveClickHandler(this._archiveClickHandler);
+    this._taskComponent.setEditClickHandler(this._editClickHandler);
+    this._taskComponent.setFavoriteClickHandler(this._favoriteClickHandler);
+    this._taskFormComponent.setFormSubmitHandler(this._formSubmitClickHandler);
+  }
+
+  _bindInnerHandlers() {
+    this._archiveClickHandler = this._archiveClickHandler.bind(this);
+    this._editClickHandler = this._editClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._formSubmitClickHandler = this._formSubmitClickHandler.bind(this);
+    this._documentEscapeHandler = this._documentEscapeHandler.bind(this);
   }
 
   _archiveClickHandler() {

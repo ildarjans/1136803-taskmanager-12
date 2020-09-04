@@ -9,16 +9,18 @@ export default class TaskEditView extends SmartView {
     super();
     this._data = TaskEditView.parseTaskToData(task);
 
+    this._bindInnerHandlers();
+    this._setInnerHandlers();
+
+  }
+
+  _bindInnerHandlers() {
     this._dueDateClickHandler = this._dueDateClickHandler.bind(this);
     this._repeatingClickHandler = this._repeatingClickHandler.bind(this);
     this._daysRepeatingHandler = this._daysRepeatingHandler.bind(this);
     this._colorChangeHandler = this._colorChangeHandler.bind(this);
     this._descriptionChangeHandler = this._descriptionChangeHandler.bind(this);
-
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-
-    this._setInnerHandlers();
-
   }
 
   setFormSubmitHandler(cb) {

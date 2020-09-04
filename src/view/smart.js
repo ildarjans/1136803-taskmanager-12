@@ -13,7 +13,7 @@ export default class SmartView extends AbstractView {
 
     const newElement = this.getElement();
     parent.replaceChild(newElement, prevElement);
-    prevElement = null; // is it nessesary?
+    prevElement = null;
     this.restoreHandlers();
   }
 

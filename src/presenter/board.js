@@ -11,8 +11,8 @@ import LoadMoreButtonView from '../view/load-more-button.js';
 import EmptyBoardNotificationView from '../view/empty-board-message.js';
 import TaskPresenter from './task.js';
 import {renderLastPlaceElement} from '../utils/render.js';
-import {updateItem} from '../utils/common.js';
-import {sortTasksAscOrder, sortTasksDescOrder} from '../utils/tasks.js';
+
+import {sortTasksAscOrder, sortTasksDescOrder, updateItem} from '../utils/tasks.js';
 
 export default class BoardPresenter {
   constructor(mainContainer) {

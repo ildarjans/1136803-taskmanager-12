@@ -4,9 +4,6 @@ import {isTaskRepeating} from '../utils/tasks.js';
 
 // use here coz it's only for this mock module
 const MAX_DAY_DEVIATION = 7;
-const LOWER_HOUR = 7;
-const HIGHER_HOUR = 23;
-const MINS_IN_HOUR = 59;
 
 const descriptions = [
   `Изучить теорию`,
@@ -16,17 +13,15 @@ const descriptions = [
 
 function getDeadlineDate() {
   let newDate = new Date();
-  const day = newDate.getUTCDate() + getRandomInteger(-MAX_DAY_DEVIATION, MAX_DAY_DEVIATION);
-  const hour = getRandomInteger(HIGHER_HOUR, LOWER_HOUR);
-  const minutes = getRandomInteger(MINS_IN_HOUR);
+  const day = newDate.getDate() + getRandomInteger(-MAX_DAY_DEVIATION, MAX_DAY_DEVIATION);
 
-  newDate.setUTCDate(day);
-  newDate.setUTCHours(hour, minutes);
+  newDate.setDate(day);
+  newDate.setHours(23, 59, 59, 999);
 
   return newDate;
 }
 
-function generateId() {
+export function generateId() {
   const a = getRandomInteger(Date.now()).toString(16);
   const b = getRandomInteger(Date.now()).toString(16);
   return `${a}${b}`;
@@ -62,4 +57,3 @@ export function getRandomTask() {
     dueDate,
   };
 }
-

@@ -8,9 +8,6 @@ export default class AbstractView {
     this._element = null;
     this._callbacks = {};
   }
-  _getTemplate() {
-    throw new Error(`Abstract class. Don't implement _getTemplate method`);
-  }
 
   getElement() {
     if (!this._element) {
@@ -21,5 +18,9 @@ export default class AbstractView {
 
   resetElement() {
     this._element = null;
+  }
+
+  _getTemplate() {
+    throw new Error(`Abstract class. Don't implement _getTemplate method`);
   }
 }

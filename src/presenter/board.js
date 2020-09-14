@@ -2,6 +2,9 @@ import {
   CARDS_TO_DISPLAY,
   EMPTY_MESSAGE,
   SortType,
+  UserAction,
+  UpdateType,
+  FilterType,
 } from '../consts.js';
 
 import MainBoardView from '../view/main-board.js';
@@ -10,84 +13,132 @@ import TasksBoardView from '../view/tasks-board.js';
 import LoadMoreButtonView from '../view/load-more-button.js';
 import EmptyBoardNotificationView from '../view/empty-board-message.js';
 import TaskPresenter from './task.js';
-import {renderLastPlaceElement} from '../utils/render.js';
+import FilterPresenter from './filter.js';
+import NewTaskPresenter from './new-task.js';
+import {renderLastPlaceElement, removeElement, renderFirstPlaceElement} from '../utils/render.js';
 
-import {sortTasksAscOrder, sortTasksDescOrder, updateItem} from '../utils/tasks.js';
+import {sortTasksAscOrder, sortTasksDescOrder} from '../utils/tasks.js';
 
 export default class BoardPresenter {
-  constructor(mainContainer) {
+  constructor(mainContainer, filterModel, tasksModel) {
     this._mainContainer = mainContainer;
+    this._tasksModel = tasksModel;
+    this._filterModel = filterModel;
     this._tasks = null;
     this._sourcedTasks = null; // immutable tasks instance
     this._mainBoard = new MainBoardView();
-    this._sortList = new SortListView();
+    this._sortList = null;
     this._taskBoard = new TasksBoardView();
     this._loadMoreBtn = null;
-    this._emptyBoardNotification = new EmptyBoardNotificationView(EMPTY_MESSAGE);
+    this._emptyBoardNotification = null;
     this._lastTaskIndex = 0;
+    this._currentSortType = SortType.DEFAULT;
+    this._renderStep = CARDS_TO_DISPLAY;
 
     this._taskPresenter = {};
 
     this._bindInnerHandlers();
 
+    this._tasksModel.addObserver(this._modelEventHandler);
+    this._filterModel.addObserver(this._modelEventHandler);
+
+    this._newTaskPresenter = new NewTaskPresenter(this._taskBoard, this._actionViewHandler);
   }
 
-  init(tasks) {
-    this._tasks = tasks;
-    this._sourcedTasks = tasks;
-
+  init() {
     this._renderMainBoard();
-
-    if (this._tasks.length === 0) {
-      this._renderNotification();
-      return;
-    }
-
-    this._renderSortList();
-    this._renderTaskSlice();
     this._renderTaskBoard();
 
-    if (this._tasks.length > this._lastTaskIndex) {
-      this._renderLoadMoreButton();
+    this._renderBoard();
+  }
+
+  createTask() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(FilterType.ALL);
+    this._newTaskPresenter.init();
+  }
+
+  _actionViewHandler(userAction, updateType, update) {
+    switch (userAction) {
+      case UserAction.UPDATE_TASK:
+        this._tasksModel.updateTask(updateType, update);
+        break;
+      case UserAction.ADD_TASK:
+        this._tasksModel.addTask(updateType, update);
+        break;
+      case UserAction.DELETE_TASK:
+        this._tasksModel.deleteTask(updateType, update);
+        break;
     }
   }
 
   _bindInnerHandlers() {
-    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
-    this._taskChangeHandler = this._taskChangeHandler.bind(this);
+    this.createTask = this.createTask.bind(this);
+    this._actionViewHandler = this._actionViewHandler.bind(this);
+    this._clearTasksBoard = this._clearTasksBoard.bind(this);
+    this._loadMoreBtnClickHandler = this._loadMoreBtnClickHandler.bind(this);
+    this._modelEventHandler = this._modelEventHandler.bind(this);
     this._modeChangeHandler = this._modeChangeHandler.bind(this);
-    this._loadMoreBtnClickHandler = this._renderTaskSlice.bind(this);
     this._sortByTypeClickHandler = this._sortByTypeClickHandler.bind(this);
   }
 
-  _renderSortList() {
-    renderLastPlaceElement(this._mainBoard, this._sortList);
-    this._sortList.setSortClickHandler(this._sortByTypeClickHandler);
+  _clearTasksBoard(resetLastTaskIndex, resetSortType) {
+    Object
+      .values(this._taskPresenter)
+      .forEach((presenter) => presenter.resetTask());
+    this._taskPresenter = {};
+
+    removeElement(this._sortList);
+    removeElement(this._emptyBoardNotification);
+    removeElement(this._loadMoreBtn);
+
+    if (resetLastTaskIndex) {
+      this._lastTaskIndex = 0;
+    }
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DEFAULT;
+    }
   }
 
-  _sortByTypeClickHandler(sortType) {
-    this._sortTasksList(sortType);
-    this._renderSortedTaskSlice();
-  }
-
-  _renderSortedTaskSlice() {
-    const lastIndex = this._lastTaskIndex;
-    this._clearTaskBoard();
-    this._tasks
-      .slice(0, lastIndex)
-      .forEach((task) => this._renderTask(task));
-  }
-
-  _sortTasksList(order) {
-    switch (order) {
+  _getTasks() {
+    const filterType = this._filterModel.getFilter();
+    const tasks = this._tasksModel.getTasks();
+    const filteredTasks = FilterPresenter.getFilteredTasks(tasks, filterType);
+    switch (this._currentSortType) {
       case SortType.ASC:
-        this._tasks.sort(sortTasksAscOrder);
-        break;
+        return filteredTasks.sort(sortTasksAscOrder);
       case SortType.DESC:
-        this._tasks.sort(sortTasksDescOrder);
+        return filteredTasks.sort(sortTasksDescOrder);
+    }
+    return filteredTasks;
+  }
+
+  _loadMoreBtnClickHandler() {
+    const tasksCount = this._getTasks().length;
+    const nextTasksSliceLength = Math.min(tasksCount, this._lastTaskIndex + CARDS_TO_DISPLAY);
+    const tasks = this._getTasks().slice(this._lastTaskIndex, nextTasksSliceLength);
+
+    this._renderTasks(tasks);
+
+    if (nextTasksSliceLength >= tasksCount) {
+      removeElement(this._loadMoreBtn);
+    }
+  }
+
+  _modelEventHandler(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._taskPresenter[data.id].init(data);
         break;
-      default:
-        this._tasks = this._sourcedTasks.slice();
+      case UpdateType.MINOR:
+        this._clearTasksBoard(true);
+        this._renderBoard();
+        break;
+      case UpdateType.MAJOR:
+        this._clearTasksBoard(true, true);
+        this._renderBoard();
+        break;
     }
   }
 
@@ -95,6 +146,24 @@ export default class BoardPresenter {
     Object
       .values(this._taskPresenter)
       .forEach((presenter) => presenter.resetView());
+  }
+
+  _renderBoard() {
+    const tasks = this._getTasks();
+    const tasksCount = tasks.length;
+
+    if (tasksCount === 0) {
+      this._renderNotification();
+      return;
+    }
+
+    this._renderSortList();
+
+    this._renderTasks(tasks.slice(0, Math.min(tasksCount, this._renderStep)));
+
+    if (tasksCount > this._lastTaskIndex) {
+      this._renderLoadMoreButton();
+    }
   }
 
   _renderMainBoard() {
@@ -106,6 +175,7 @@ export default class BoardPresenter {
   }
 
   _renderNotification() {
+    this._emptyBoardNotification = new EmptyBoardNotificationView(EMPTY_MESSAGE);
     renderLastPlaceElement(this._mainBoard, this._emptyBoardNotification);
   }
 
@@ -113,6 +183,13 @@ export default class BoardPresenter {
     this._loadMoreBtn = new LoadMoreButtonView();
     this._loadMoreBtn.setClickHandler(this._loadMoreBtnClickHandler);
     renderLastPlaceElement(this._mainBoard, this._loadMoreBtn);
+  }
+
+  _renderSortList() {
+    this._sortList = null;
+    this._sortList = new SortListView(this._currentSortType);
+    this._sortList.setSortClickHandler(this._sortByTypeClickHandler);
+    renderFirstPlaceElement(this._mainBoard, this._sortList);
   }
 
   _removeLoadMoreButton() {
@@ -123,21 +200,14 @@ export default class BoardPresenter {
     }
   }
 
-  _renderTaskSlice() {
-    const sliceStep = this._lastTaskIndex + CARDS_TO_DISPLAY;
-    this._tasks
-      .slice(this._lastTaskIndex, sliceStep)
-      .forEach((task) => this._renderTask(task));
-
-    if (this._lastTaskIndex === this._tasks.length) {
-      this._removeLoadMoreButton();
-    }
+  _renderTasks(tasks) {
+    tasks.forEach((task) => this._renderTask(task));
   }
 
   _renderTask(task) {
     const taskPresenter = new TaskPresenter(
         this._taskBoard,
-        this._taskChangeHandler,
+        this._actionViewHandler,
         this._modeChangeHandler
     );
     taskPresenter.init(task);
@@ -145,17 +215,13 @@ export default class BoardPresenter {
     this._lastTaskIndex++;
   }
 
-  _taskChangeHandler(updatedTask) {
-    this._tasks = updateItem(this._tasks, updatedTask);
-    this._sourcedTasks = updateItem(this._sourcedTasks, updatedTask);
-    this._taskPresenter[updatedTask.id].init(updatedTask);
+  _sortByTypeClickHandler(sortType) {
+    if (sortType === this._currentSortType) {
+      return;
+    }
+    this._currentSortType = sortType;
+    this._clearTasksBoard(true);
+    this._renderBoard();
   }
 
-  _clearTaskBoard() {
-    Object
-      .values(this._taskPresenter)
-      .forEach((presenter) => presenter.resetTask());
-    this._taskPresenter = {};
-    this._lastTaskIndex = 0;
-  }
 }

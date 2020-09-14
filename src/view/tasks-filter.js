@@ -1,40 +1,56 @@
 import AbstractView from './Abstract.js';
+// import {FilterType} from '../consts.js';
 
-function createFiltersTemplate(filterTitles) {
+function createFiltersTemplate(filters, currentType) {
   return (
     `<section class="main__filter filter container">
-    ${createFilterContent(filterTitles)}
+    ${createFilterContent(filters, currentType)}
   </section>`
   );
 }
 
-function createFilterContent(filters) {
+function createFilterContent(filters, currentType) {
   return filters.map((filter) => {
+    const {type, name, count} = filter;
     return `
     <input
       type="radio"
-      id="filter__${filter.title}"
+      id="filter__${type}"
       class="filter__input visually-hidden"
       name="filter"
-      ${filter.title === `all` ? `checked` : ``}
-      ${filter.count ? `` : `disabled`}
+      value="${type}"
+      ${type === currentType ? `checked` : ``}
+      ${count ? `` : `disabled`}
     />
-    <label for="filter__all" class="filter__label">
-      ${filter.title}
+    <label for="filter__${type}" class="filter__label">
+      ${name}
       <span class="filter__all-count">
-        ${filter.count}
+        ${count}
       </span>
     </label>`;
   }).join(``);
 }
 
 export default class FiltersView extends AbstractView {
-  constructor(titles) {
+  constructor(filters, currentFilterType) {
     super();
-    this._titles = titles;
+    this._filters = filters;
+    this._currentFilterType = currentFilterType;
+    this._filterClickHandler = this._filterClickHandler.bind(this);
+  }
+
+  setFilterClickHandler(cb) {
+    this._callbacks.filterClick = cb;
+    this.getElement().addEventListener(`change`, this._filterClickHandler);
+  }
+
+  _filterClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.filterClick(evt.target.value);
   }
 
   _getTemplate() {
-    return createFiltersTemplate(this._titles);
+    return createFiltersTemplate(this._filters, this._currentFilterType);
   }
+
 }

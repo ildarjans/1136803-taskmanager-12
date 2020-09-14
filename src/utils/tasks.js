@@ -1,6 +1,21 @@
 import moment from 'moment';
+
 export function isTaskRepeating(schedule) {
   return Object.values(schedule).some((day) => day);
+}
+
+export function isTaskExpired(date) {
+  if (!(date instanceof Date)) {
+    return false;
+  }
+  return (date.getTime() - Date.now()) < 0 ? true : false;
+}
+
+export function isTaskExpiredToday(date) {
+  if (!(date instanceof Date)) {
+    return false;
+  }
+  return isSameDate(date, new Date());
 }
 
 export function sortTasksAscOrder(a, b) {
@@ -17,14 +32,6 @@ export function sortTasksDescOrder(a, b) {
   return a.dueDate < b.dueDate ? 1 : -1;
 }
 
-export function isSameDay(date1, date2) {
-  return (
-    date1 && date2 &&
-    date1.getDate() === date2.getDate() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getYear() === date2.getYear()
-  );
-}
 export function getTaskDateFormatString(dueDate) {
   if (dueDate instanceof Date) {
     return moment(dueDate).format(`D MMMM`);
@@ -32,14 +39,9 @@ export function getTaskDateFormatString(dueDate) {
   return ``;
 }
 
-export function updateItem(items, update) {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
+export function isSameDate(date1, date2) {
+  if (!date1 && !date2) {
+    return true;
   }
-
-  items.splice(index, 1, update);
-
-  return items;
+  return moment(date1).isSame(date2, `day`);
 }

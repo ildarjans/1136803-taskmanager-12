@@ -37,6 +37,10 @@ export function replaceDOMElement(newChild, oldСhild) {
 }
 
 export function removeElement(element) {
+  if (!element) {
+    return;
+  }
+
   if (!(element instanceof AbstractView)) {
     throw new Error(`u can remove only instance of Abstract class`);
   }

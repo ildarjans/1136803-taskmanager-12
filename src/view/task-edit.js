@@ -1,14 +1,15 @@
 import SmartView from './smart.js';
 import {getTaskDateFormatString} from '../utils/tasks.js';
-import {COLORS} from '../consts.js';
+import {COLORS, BLANK_TASK} from '../consts.js';
 import {isTaskRepeating} from '../utils/tasks.js';
 import flatpickr from 'flatpickr';
+import he from 'he';
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 
 export default class TaskEditView extends SmartView {
-  constructor(task) {
+  constructor(task = BLANK_TASK) {
     super();
     this._data = TaskEditView.parseTaskToData(task);
     this._datepicker = null;
@@ -18,19 +19,24 @@ export default class TaskEditView extends SmartView {
 
   }
 
-  _bindInnerHandlers() {
-    this._dueDateClickHandler = this._dueDateClickHandler.bind(this);
-    this._repeatingClickHandler = this._repeatingClickHandler.bind(this);
-    this._daysRepeatingHandler = this._daysRepeatingHandler.bind(this);
-    this._colorChangeHandler = this._colorChangeHandler.bind(this);
-    this._descriptionChangeHandler = this._descriptionChangeHandler.bind(this);
-    this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
+  removeElement() {
+    super.removeElement();
 
-    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+  }
 
+  restoreHandlers() {
     this._setDatepicker();
     this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callbacks.formSubmit);
+    this.setDeleteClickHandler(this._callbacks.delete);
+  }
 
+  reset(task) {
+    this.updateData(TaskEditView.parseTaskToData(task));
   }
 
   setFormSubmitHandler(cb) {
@@ -38,14 +44,81 @@ export default class TaskEditView extends SmartView {
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 
-  restoreHandlers() {
-    this._setDatepicker();
-    this._setInnerHandlers();
-    this.setFormSubmitHandler(this._callbacks.formSubmit);
+  setDeleteClickHandler(cb) {
+    this._callbacks.delete = cb;
+    this.getElement()
+      .querySelector(`.card__delete`)
+      .addEventListener(`click`, this._deleteClickHandler);
   }
 
-  reset(task) {
-    this.updateData(TaskEditView.parseTaskToData(task));
+  _bindInnerHandlers() {
+    this._dueDateClickHandler = this._dueDateClickHandler.bind(this);
+    this._repeatingClickHandler = this._repeatingClickHandler.bind(this);
+    this._daysRepeatingHandler = this._daysRepeatingHandler.bind(this);
+    this._colorChangeHandler = this._colorChangeHandler.bind(this);
+    this._descriptionChangeHandler = this._descriptionChangeHandler.bind(this);
+    this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+
+    this._setDatepicker();
+    this._setInnerHandlers();
+
+  }
+
+  _deleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.delete(TaskEditView.parseDataToTask(this._data));
+  }
+
+  _colorChangeHandler(evt) {
+    this.updateData({
+      color: evt.target.value
+    });
+  }
+
+  _daysRepeatingHandler(evt) {
+    const day = evt.target.value;
+    const repeat = evt.target.checked;
+    const repeating = Object.assign(
+        {},
+        this._data.repeating,
+        {
+          [day]: repeat
+        }
+    );
+    this.updateData({repeating});
+  }
+
+  _descriptionChangeHandler(evt) {
+    evt.preventDefault();
+    const desc = evt.target.value;
+    this.updateData({
+      description: desc ? desc.trim() : desc
+    }, true);
+  }
+
+  _dueDateClickHandler() {
+    if (!this._data.isRepeating) {
+      this.updateData({
+        hasDateDue: !this._data.isRepeating ? !this._data.hasDateDue : false
+      });
+    }
+  }
+
+  _dueDateChangeHandler(selectedDate) {
+    this.updateData({
+      dueDate: selectedDate[0]
+    });
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.formSubmit(TaskEditView.parseDataToTask(this._data));
+  }
+
+  _getTemplate() {
+    return createEditCardTemplate(this._data);
   }
 
   _setDatepicker() {
@@ -96,56 +169,6 @@ export default class TaskEditView extends SmartView {
         isRepeating: !this._data.isRepeating
       });
     }
-  }
-
-  _daysRepeatingHandler(evt) {
-    const day = evt.target.value;
-    const repeat = evt.target.checked;
-    const repeating = Object.assign(
-        {},
-        this._data.repeating,
-        {
-          [day]: repeat
-        }
-    );
-    this.updateData({repeating});
-  }
-
-  _descriptionChangeHandler(evt) {
-    evt.preventDefault();
-    const desc = evt.target.value;
-    this.updateData({
-      description: desc ? desc.trim() : desc
-    }, true);
-  }
-
-  _colorChangeHandler(evt) {
-    this.updateData({
-      color: evt.target.value
-    });
-  }
-
-  _dueDateClickHandler() {
-    if (!this._data.isRepeating) {
-      this.updateData({
-        hasDateDue: !this._data.isRepeating ? !this._data.hasDateDue : false
-      });
-    }
-  }
-
-  _dueDateChangeHandler(selectedDate) {
-    this.updateData({
-      dueDate: selectedDate[0]
-    });
-  }
-
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-    this._callbacks.formSubmit(TaskEditView.parseDataToTask(this._data));
-  }
-
-  _getTemplate() {
-    return createEditCardTemplate(this._data);
   }
 
   static parseTaskToData(task) {
@@ -215,7 +238,7 @@ function createEditCardTemplate(data) {
               class="card__text"
               placeholder="Start typing your text here..."
               name="text"
-            >${description}
+            >${he.encode(description)}
             </textarea>
           </label>
         </div>

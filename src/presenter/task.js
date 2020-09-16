@@ -6,7 +6,13 @@ import {
   removeElement
 } from '../utils/render.js';
 
-import {TaskMode as Mode} from '../consts.js';
+import {isTaskRepeating, isSameDate} from '../utils/tasks.js';
+
+import {
+  TaskMode as Mode,
+  UpdateType,
+  UserAction
+} from '../consts.js';
 
 export default class TaskPresenter {
   constructor(taskListContainer, changeData, changeMode) {
@@ -53,23 +59,21 @@ export default class TaskPresenter {
 
   }
 
-  _setInnerHandlers() {
-    this._taskComponent.setArchiveClickHandler(this._archiveClickHandler);
-    this._taskComponent.setEditClickHandler(this._editClickHandler);
-    this._taskComponent.setFavoriteClickHandler(this._favoriteClickHandler);
-    this._taskFormComponent.setFormSubmitHandler(this._formSubmitClickHandler);
+  resetView() {
+    if (this._mode === Mode.EDIT) {
+      this._replaceFormToCard();
+    }
   }
 
-  _bindInnerHandlers() {
-    this._archiveClickHandler = this._archiveClickHandler.bind(this);
-    this._editClickHandler = this._editClickHandler.bind(this);
-    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
-    this._formSubmitClickHandler = this._formSubmitClickHandler.bind(this);
-    this._documentEscapeHandler = this._documentEscapeHandler.bind(this);
+  resetTask() {
+    removeElement(this._taskComponent);
+    removeElement(this._taskFormComponent);
   }
 
   _archiveClickHandler() {
     this._changeData(
+        UserAction.UPDATE_TASK,
+        UpdateType.MINOR,
         Object.assign(
             this._task,
             {
@@ -79,19 +83,21 @@ export default class TaskPresenter {
     );
   }
 
-  _favoriteClickHandler() {
-    this._changeData(
-        Object.assign(
-            this._task,
-            {
-              isFavorite: !this._task.isFavorite
-            }
-        )
-    );
+  _bindInnerHandlers() {
+    this._archiveClickHandler = this._archiveClickHandler.bind(this);
+    this._editClickHandler = this._editClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._formSubmitClickHandler = this._formSubmitClickHandler.bind(this);
+    this._documentEscapeHandler = this._documentEscapeHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
   }
 
-  _editClickHandler() {
-    this._replaceCardToForm();
+  _deleteClickHandler(update) {
+    this._changeData(
+        UserAction.DELETE_TASK,
+        UpdateType.MINOR,
+        update
+    );
   }
 
   _documentEscapeHandler(evt) {
@@ -102,8 +108,32 @@ export default class TaskPresenter {
     }
   }
 
-  _formSubmitClickHandler(task) {
-    this._changeData(task);
+  _editClickHandler() {
+    this._replaceCardToForm();
+  }
+
+  _favoriteClickHandler() {
+    this._changeData(
+        UserAction.UPDATE_TASK,
+        UpdateType.MINOR,
+        Object.assign(
+            this._task,
+            {
+              isFavorite: !this._task.isFavorite
+            }
+        )
+    );
+  }
+
+  _formSubmitClickHandler(update) {
+    const inMinorUpdate =
+      !isSameDate(update.dueDate, this._task.dueDate) ||
+      isTaskRepeating(update.repeating) !== isTaskRepeating(this._task.repeating);
+    this._changeData(
+        UserAction.UPDATE_TASK,
+        inMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+        update
+    );
     this._replaceFormToCard();
   }
 
@@ -120,15 +150,12 @@ export default class TaskPresenter {
     this._mode = Mode.DEFAULT;
   }
 
-  resetView() {
-    if (this._mode === Mode.EDIT) {
-      this._replaceFormToCard();
-    }
-  }
-
-  resetTask() {
-    removeElement(this._taskComponent);
-    removeElement(this._taskFormComponent);
+  _setInnerHandlers() {
+    this._taskComponent.setArchiveClickHandler(this._archiveClickHandler);
+    this._taskComponent.setEditClickHandler(this._editClickHandler);
+    this._taskComponent.setFavoriteClickHandler(this._favoriteClickHandler);
+    this._taskFormComponent.setFormSubmitHandler(this._formSubmitClickHandler);
+    this._taskFormComponent.setDeleteClickHandler(this._deleteClickHandler);
   }
 
 }

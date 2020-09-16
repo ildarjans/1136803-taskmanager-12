@@ -1,5 +1,6 @@
 import {getTaskDateFormatString} from '../utils/tasks.js';
 import AbstractView from './Abstract.js';
+import he from 'he';
 
 export default class TaskView extends AbstractView {
   constructor(task) {
@@ -10,19 +11,9 @@ export default class TaskView extends AbstractView {
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
-  _editClickHandler(evt) {
-    evt.preventDefault();
-    this._callbacks.editClick();
-  }
-
-  _archiveClickHandler(evt) {
-    evt.preventDefault();
-    this._callbacks.archiveClick();
-  }
-
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this._callbacks.favoriteClick();
+  setArchiveClickHandler(cb) {
+    this._callbacks.archiveClick = cb;
+    this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, this._archiveClickHandler);
   }
 
   setEditClickHandler(cb) {
@@ -30,14 +21,24 @@ export default class TaskView extends AbstractView {
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, this._editClickHandler);
   }
 
-  setArchiveClickHandler(cb) {
-    this._callbacks.archiveClick = cb;
-    this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, this._archiveClickHandler);
-  }
-
   setFavoriteClickHandler(cb) {
     this._callbacks.favoriteClick = cb;
     this.getElement().querySelector(`.card__btn--favorites`).addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  _archiveClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.archiveClick();
+  }
+
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.editClick();
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.favoriteClick();
   }
 
   _getTemplate() {
@@ -53,7 +54,7 @@ export default class TaskView extends AbstractView {
 
     const dueDateString = dueDate ? getTaskDateFormatString(dueDate) : ``;
 
-    const deadlineClass = dueDate && dueDate < new Date() ? `card--deadline` : ``;
+    const deadlineClass = dueDate && dueDate.getTime() < Date.now() ? `card--deadline` : ``;
 
     const archiveClass = !isArchive ? `card__btn--disabled` : ``;
 
@@ -86,7 +87,7 @@ export default class TaskView extends AbstractView {
           </div>
 
           <div class="card__textarea-wrap">
-            <p class="card__text">${description}.</p>
+            <p class="card__text">${he.encode(description)}.</p>
           </div>
 
           <div class="card__settings">

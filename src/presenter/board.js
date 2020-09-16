@@ -4,7 +4,6 @@ import {
   SortType,
   UserAction,
   UpdateType,
-  FilterType,
 } from '../consts.js';
 
 import MainBoardView from '../view/main-board.js';
@@ -15,7 +14,11 @@ import EmptyBoardNotificationView from '../view/empty-board-message.js';
 import TaskPresenter from './task.js';
 import FilterPresenter from './filter.js';
 import NewTaskPresenter from './new-task.js';
-import {renderLastPlaceElement, removeElement, renderFirstPlaceElement} from '../utils/render.js';
+import {
+  renderLastPlaceElement,
+  removeElement,
+  renderFirstPlaceElement
+} from '../utils/render.js';
 
 import {sortTasksAscOrder, sortTasksDescOrder} from '../utils/tasks.js';
 
@@ -39,9 +42,6 @@ export default class BoardPresenter {
 
     this._bindInnerHandlers();
 
-    this._tasksModel.addObserver(this._modelEventHandler);
-    this._filterModel.addObserver(this._modelEventHandler);
-
     this._newTaskPresenter = new NewTaskPresenter(this._taskBoard, this._actionViewHandler);
   }
 
@@ -49,13 +49,25 @@ export default class BoardPresenter {
     this._renderMainBoard();
     this._renderTaskBoard();
 
+    this._tasksModel.addObserver(this._modelEventHandler);
+    this._filterModel.addObserver(this._modelEventHandler);
+
     this._renderBoard();
   }
 
-  createTask() {
-    this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(FilterType.ALL);
-    this._newTaskPresenter.init();
+  createTask(cb) {
+    this._newTaskPresenter.init(cb);
+  }
+
+  destroy() {
+    this._clearTasksBoard(true, true);
+
+    removeElement(this._taskBoard);
+    removeElement(this._mainBoard);
+
+    this._tasksModel.removeObserver(this._modelEventHandler);
+    this._filterModel.removeObserver(this._modelEventHandler);
+
   }
 
   _actionViewHandler(userAction, updateType, update) {

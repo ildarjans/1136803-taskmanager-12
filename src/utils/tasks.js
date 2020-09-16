@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {DAY_IN_MS} from '../consts.js';
 
 export function isTaskRepeating(schedule) {
   return Object.values(schedule).some((day) => day);
@@ -16,6 +17,17 @@ export function isTaskExpiredToday(date) {
     return false;
   }
   return isSameDate(date, new Date());
+}
+
+export function getCurrentDate() {
+  const currentDate = new Date();
+  currentDate.setHours(23, 59, 59, 999);
+  return currentDate;
+}
+
+export function getDateWeekBefore(today) {
+  const daysBeforeInMs = DAY_IN_MS * 6;
+  return new Date(today.getTime() - daysBeforeInMs);
 }
 
 export function sortTasksAscOrder(a, b) {

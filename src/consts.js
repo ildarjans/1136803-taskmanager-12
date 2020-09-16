@@ -1,13 +1,16 @@
 export const CARDS_TO_DISPLAY = 8;
+export const DAY_IN_MS = 1000 * 60 * 60 * 24;
 export const TASKS_LENGTH = 21;
 export const EMPTY_MESSAGE = `Click «ADD NEW TASK» in menu to create your first task`;
-export const COLORS = [
-  `black`,
-  `yellow`,
-  `blue`,
-  `green`,
-  `pink`
-];
+export const Color = {
+  BLACK: `black`,
+  YELLOW: `yellow`,
+  BLUE: `blue`,
+  GREEN: `green`,
+  PINK: `pink`
+};
+
+export const COLORS = Object.values(Color);
 
 export const TaskMode = {
   DEFAULT: `DEFAULT`,
@@ -57,4 +60,10 @@ export const BLANK_TASK = {
     'sa': false,
     'su': false
   }
+};
+
+export const SiteMenuItem = {
+  ADD_NEW_TASK: `ADD_NEW_TASK`,
+  TASKS: `TASKS`,
+  STATISTICS: `STATISTICS`
 };

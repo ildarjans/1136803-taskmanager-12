@@ -13,10 +13,7 @@ export function isTaskExpired(date) {
 }
 
 export function isTaskExpiredToday(date) {
-  if (!(date instanceof Date)) {
-    return false;
-  }
-  return isSameDate(date, new Date());
+  return (date instanceof Date) ? isSameDate(date, new Date()) : ``;
 }
 
 export function getCurrentDate() {
@@ -34,26 +31,20 @@ export function sortTasksAscOrder(a, b) {
   if (!a.dueDate && !b.dueDate) {
     return 0;
   }
-  return a.dueDate > b.dueDate ? 1 : -1;
+  return a.dueDate - b.dueDate;
 }
 
 export function sortTasksDescOrder(a, b) {
   if (!a.dueDate && !b.dueDate) {
     return 0;
   }
-  return a.dueDate < b.dueDate ? 1 : -1;
+  return b.dueDate - a.dueDate;
 }
 
 export function getTaskDateFormatString(dueDate) {
-  if (dueDate instanceof Date) {
-    return moment(dueDate).format(`D MMMM`);
-  }
-  return ``;
+  return dueDate instanceof Date ? moment(dueDate).format(`D MMMM`) : ``;
 }
 
 export function isSameDate(date1, date2) {
-  if (!date1 && !date2) {
-    return true;
-  }
-  return moment(date1).isSame(date2, `day`);
+  return (!date1 && !date2) ? true : moment(date1).isSame(date2, `day`);
 }

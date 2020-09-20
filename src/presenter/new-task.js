@@ -12,12 +12,13 @@ export default class NewTaskPresenter {
     this._changeData = changeData;
 
     this._taskEditComponent = null;
-
+    this._destroyCallback = null;
     this._setInnerHandlers();
 
   }
 
-  init() {
+  init(cb) {
+    this._destroyCallback = cb;
     if (this._taskEditComponent) {
       return;
     }
@@ -34,6 +35,10 @@ export default class NewTaskPresenter {
   destroy() {
     if (!this._taskEditComponent) {
       return;
+    }
+
+    if (this._destroyCallback) {
+      this._destroyCallback();
     }
 
     removeElement(this._taskEditComponent);

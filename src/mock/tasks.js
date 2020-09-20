@@ -1,6 +1,6 @@
 import {getRandomInteger, getRandomArrayElement} from '../utils/common.js';
-import {COLORS} from '../consts.js';
-import {isTaskRepeating} from '../utils/tasks.js';
+import {COLORS, DAY_IN_MS} from '../consts.js';
+import {isTaskRepeating, getCurrentDate} from '../utils/tasks.js';
 
 // use here coz it's only for this mock module
 const MAX_DAY_DEVIATION = 7;
@@ -12,13 +12,9 @@ const descriptions = [
 ];
 
 function getDeadlineDate() {
-  let newDate = new Date();
-  const day = newDate.getDate() + getRandomInteger(-MAX_DAY_DEVIATION, MAX_DAY_DEVIATION);
-
-  newDate.setDate(day);
-  newDate.setHours(23, 59, 59, 999);
-
-  return newDate;
+  let today = getCurrentDate();
+  const dayDeviationInMs = DAY_IN_MS * getRandomInteger(-MAX_DAY_DEVIATION, MAX_DAY_DEVIATION);
+  return new Date(today.getTime() + dayDeviationInMs);
 }
 
 export function generateId() {
